@@ -18,6 +18,7 @@ d = DirectSlider(borderWidth=(0, 0))
 
 """
 
+
 class DirectSlider(DirectFrame):
     """
     DirectSlider -- a widget which represents a slider that the
@@ -75,11 +76,44 @@ class DirectSlider(DirectFrame):
 
         self.guiItem.setThumbButton(self.thumb.guiItem)
 
+        # setup keyboard navigation for the thumb
+        self.thumb.activate = self.activate
+        self.thumb.deactivate = self.deactivate
+
         # Bind command function
         self.bind(DGG.ADJUST, self.commandFunc)
 
         # Call option initialization functions
         self.initialiseoptions(DirectSlider)
+
+    def activate(self):
+        self.setup_keyboard_navigation()
+
+    def deactivate(self):
+        self.ignore_keyboard_navigation()
+
+    def setup_keyboard_navigation(self):
+        # todo check orientation of the slider to determine scroll direction
+        for key, value in base.gui_controller.key_map.items():
+            if isinstance(value, tuple):
+                if key in ("d", "r"):
+                    self.accept(value[0], self.scrollStep, extraArgs=[1])
+                    self.accept(value[0] + "-repeat", self.scrollStep, extraArgs=[1])
+                elif key in ("u", "l"):
+                    self.accept(value[0], self.scrollStep, extraArgs=[-1])
+                    self.accept(value[0] + "-repeat", self.scrollStep, extraArgs=[-1])
+
+    def ignore_keyboard_navigation(self):
+        for key, value in base.gui_controller.key_map.items():
+            if isinstance(value, tuple):
+                if key in ("u", "d", "l", "r"):
+                    self.ignore(value[0])
+                    self.ignore(value[0] + "-repeat")
+
+    def scrollStep(self, stepCount):
+        """Scrolls the indicated number of steps forward.  If
+        stepCount is negative, scrolls backward."""
+        self['value'] = self.guiItem.getValue() + self.guiItem.getScrollSize() * stepCount
 
     def setRange(self):
         # Try to preserve the value across a setRange call.

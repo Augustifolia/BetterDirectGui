@@ -3,10 +3,11 @@ import direct.gui.DirectGuiBase as DirectGuiBase
 from direct.showbase.ShowBase import ShowBase
 
 base: ShowBase
-print("y")
 
 
 class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
+    """Subclass of DirectGuiWidget with keyboard navigation support."""
+
     def __init__(self, parent=None, **kw):
         # True for default implementation (using node-graph to infer jump order)
         # False for disabled
@@ -33,7 +34,6 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
 
         # Initialize the base classes (after defining the options).
         DirectGuiBase.DirectGuiWidget.__init__(self, parent)
-        print(self["selected"])
 
         # Call option initialization functions
         self.initialiseoptions(DirectGuiWidget)

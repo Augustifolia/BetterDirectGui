@@ -12,7 +12,7 @@ class DirectEntryScroll(DirectFrame):
             ('pgFunc',       PGVirtualFrame,    None),
             ('relief',       None,              None),
             ('clipSize',     (-1, 1, -1, 1),    self.setClipSize),
-            ('selectable',   True,              None),
+            ('selectable',   False,             None),
             )
 
         self.defineoptions(kw, optiondefs)

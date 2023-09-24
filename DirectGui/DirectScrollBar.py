@@ -93,11 +93,49 @@ class DirectScrollBar(DirectFrame):
         self.guiItem.setLeftButton(self.decButton.guiItem)
         self.guiItem.setRightButton(self.incButton.guiItem)
 
+        # setup keyboard navigation for buttons
+        self.decButton.activate = self._activate_dec_button
+        self.incButton.activate = self._activate_inc_button
+        self.thumb.activate = self.activate
+        self.thumb.deactivate = self.deactivate
+
         # Bind command function
         self.bind(DGG.ADJUST, self.commandFunc)
 
         # Call option initialization functions
         self.initialiseoptions(DirectScrollBar)
+
+    def activate(self):
+        self.setup_keyboard_navigation()
+
+    def deactivate(self):
+        self.ignore_keyboard_navigation()
+
+    def setup_keyboard_navigation(self):
+        # todo check orientation of the scroll bar to determine scroll direction
+        for key, value in base.gui_controller.key_map.items():
+            if isinstance(value, tuple):
+                if key in ("d", "r"):
+                    self.accept(value[0], self.scrollStep, extraArgs=[1])
+                    self.accept(value[0] + "-repeat", self.scrollStep, extraArgs=[1])
+                elif key in ("u", "l"):
+                    self.accept(value[0], self.scrollStep, extraArgs=[-1])
+                    self.accept(value[0] + "-repeat", self.scrollStep, extraArgs=[-1])
+
+    def ignore_keyboard_navigation(self):
+        for key, value in base.gui_controller.key_map.items():
+            if isinstance(value, tuple):
+                if key in ("u", "d", "l", "r"):
+                    self.ignore(value[0])
+                    self.ignore(value[0] + "-repeat")
+
+    def _activate_inc_button(self):
+        self.scrollStep(1)
+        self.incButton["selected"] = False
+
+    def _activate_dec_button(self):
+        self.scrollStep(-1)
+        self.decButton["selected"] = False
 
     def setRange(self):
         # Try to preserve the value across a setRange call.

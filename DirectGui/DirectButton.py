@@ -79,6 +79,13 @@ class DirectButton(DirectFrame):
                   Mat4.translateMat(centerX, 0, centerY)
             pressEffectNP.setMat(mat)
 
+    def activate(self):
+        self.commandFunc("")
+        self["selected"] = False
+
+    def deactivate(self):
+        pass
+
     def setCommandButtons(self):
         # Attach command function to specified buttons
         # Left mouse button

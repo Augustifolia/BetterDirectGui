@@ -8,11 +8,12 @@ import DirectGuiBase
 
 
 class GuiController(DirectObject):
-    def __init__(self, base_np: p3d.NodePath = None, respect_sortOrder=True):
+    def __init__(self, base_np: p3d.NodePath = None, respect_sortOrder=True, do_bug_fixes=False):
         super().__init__()
         base.gui_controller = self
         self.respect_sortOrder = respect_sortOrder
         self.guiItems = DirectGuiBase.DirectGuiWidget.guiDict
+        base._do_bug_fixes = do_bug_fixes
 
         if base_np is None:
             base_np = base.aspect2d
@@ -33,8 +34,12 @@ class GuiController(DirectObject):
         }
 
         self.activate_keys()
+
+        # todo not activate if user clicks enter while doing something else
         self.accept("enter", self.activate)
         self.accept("f", self.test)
+
+        # base.messenger.toggle_verbose()
 
     def test(self):
         print(self.guiItems, "\n", DirectGuiBase.DirectGuiWidget.guiDict)
@@ -45,7 +50,9 @@ class GuiController(DirectObject):
                 self.accept(value[0], self.navigate_next, extraArgs=[key])
 
     def deactivate_keys(self):
-        self.ignore_all()
+        for key, value in self.key_map.items():
+            if isinstance(value, tuple):
+                self.ignore(value[0])
 
     def navigate_next(self, direction: str):
         if self.current_selection is None:
@@ -114,10 +121,15 @@ class GuiController(DirectObject):
         c = self.current_selection
         if self.has_option(c, "selected"):
             c["selected"] = not c["selected"]
+            if c["selected"]:
+                print("sel")
+                self.deactivate_keys()
+            else:
+                print("unsel")
+                self.activate_keys()
 
-        elif self.has_option(c, "command"):
-            if c["command"] is not None:
-                c["command"](*c["extraArgs"])
+        else:
+            print("object has no option 'selected'")
 
     def get_guiId(self, np: p3d.NodePath) -> str | None:
         name = np.getName().split("-")
@@ -152,10 +164,10 @@ class GuiController(DirectObject):
             return False
 
         try:
-            if gui["selectable"]:
+            if gui["selectable"] and not np.isHidden() and not np.isStashed():
                 return True
         except:
-            return True
+            return False
 
         return False
 
@@ -275,7 +287,9 @@ class GuiController(DirectObject):
             if child == self.current_selection:
                 if index == 0:
                     if parent == self.base_np:
-                        next_item = children[-1]
+                        # next_item = children[-1]
+                        self.current_selection = None
+                        next_item = self.get_previous_on_level()
                     else:
                         if self.is_selectable_gui(parent):
                             next_item = self.get_gui(parent)
@@ -302,7 +316,11 @@ class GuiController(DirectObject):
             while True:
                 if next_item is None:
                     self.current_selection = self.get_gui(self._current_selection.parent)
-                    next_item = self.get_next_on_level(self.current_selection.parent, skip_np=self.current_selection)
+                    if self.current_selection is not None:
+                        next_item = self.get_next_on_level(self.current_selection.parent, skip_np=self.current_selection)
+
+                    else:
+                        next_item = self.get_next_on_level()
 
                 else:
                     break
@@ -395,7 +413,8 @@ class GuiController(DirectObject):
             return
 
         children = self.get_gui_children(parent.parent)
-        while True:
+        og_parent = parent
+        for _ in range(500):
             if self.is_selectable_gui(parent):
                 break
 
@@ -405,17 +424,30 @@ class GuiController(DirectObject):
                         parent = children[-1]
                     else:
                         parent = children[index - 1]
+                    break
+
+            if parent == og_parent:
+                parent = parent.parent
+
+            if parent == self.base_np:
+                return
 
         self.current_selection = parent
 
     def child_selectable_gui(self):
         if self.current_selection is None:
             child = self.get_next_on_level()
+            print(child)
             if child is None:
                 return
 
-            self.current_selection = child
-            return
+            if self.is_selectable_gui(child):
+                self.current_selection = child
+                return
+            else:
+                self.current_selection = child
+                self.child_selectable_gui()
+                return
 
         if self.has_selectable_gui(self.current_selection):
             child = self.get_next_on_level(self.current_selection)
@@ -432,4 +464,3 @@ class GuiController(DirectObject):
                 child = guis[0]
                 self.current_selection = child
                 break
-

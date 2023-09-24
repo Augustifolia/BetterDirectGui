@@ -113,6 +113,14 @@ class DirectScrolledList(DirectFrame):
                                               )
         self.decButton.bind(DGG.B1PRESS, self.__decButtonDown)
         self.decButton.bind(DGG.B1RELEASE, self.__buttonUp)
+
+        # setup keyboard navigation for the buttons
+        self.incButton.activate = self._inc_button_activate
+        self.incButton.deactivate = self._inc_button_deactivate
+
+        self.decButton.activate = self._dec_button_activate
+        self.decButton.deactivate = self._dec_button_deactivate
+
         self.itemFrame = self.createcomponent("itemFrame", (), None,
                                               DirectFrame, (self,),
                                               )
@@ -123,6 +131,20 @@ class DirectScrolledList(DirectFrame):
         self.initialiseoptions(DirectScrolledList)
         self.recordMaxHeight()
         self.scrollTo(0)
+
+    def _inc_button_activate(self):
+        self.scrollBy(1)
+        self.incButton["selected"] = False
+
+    def _inc_button_deactivate(self):
+        pass
+
+    def _dec_button_activate(self):
+        self.scrollBy(-1)
+        self.decButton["selected"] = False
+
+    def _dec_button_deactivate(self):
+        pass
 
     def setForceHeight(self):
         assert self.notify.debugStateCall(self)

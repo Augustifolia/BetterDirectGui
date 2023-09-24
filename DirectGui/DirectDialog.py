@@ -121,7 +121,7 @@ class DirectDialog(DirectFrame):
             ('command',           None,          None),
             ('extraArgs',         [],            None),
             ('sortOrder',    DGG.NO_FADE_SORT_INDEX, None),
-            ('selectable',        True,          None),
+            ('selectable',        False,         None),
             )
         # Merge keyword options with default options
         self.defineoptions(kw, optiondefs, dynamicGroups = ("button",))

@@ -44,6 +44,8 @@ class DirectOptionMenu(DirectButton):
             # Remove press effect because it looks a bit funny
             ('pressEffect',     0,          DGG.INITOPT),
             ('selectable',      True,       None),
+            ('downFunc',        True,       None),
+            ('upFunc',          True,       None)
            )
         # Merge keyword options with default options
         self.defineoptions(kw, optiondefs)
@@ -98,6 +100,47 @@ class DirectOptionMenu(DirectButton):
         self.initialiseoptions(DirectOptionMenu)
         # Need to call this since we explicitly set frame size
         self.resetFrameSize()
+
+    def activate(self):
+        self.showPopupMenu()
+        base.gui_controller.current_selection = self.component('item%d' % 0)
+        self.setup_keyboard_navigation()
+
+    def deactivate(self):
+        self.hidePopupMenu()
+        self.ignore_keyboard_navigation()
+        if not self.fInit:
+            base.gui_controller.current_selection = self
+
+    def setup_keyboard_navigation(self):
+        down_func = self["downFunc"]
+        if down_func is True:
+            down = base.gui_controller.move_next_current_level
+        elif down_func is False:
+            down = False
+        else:
+            down = down_func
+
+        up_func = self["upFunc"]
+        if up_func is True:
+            up = base.gui_controller.move_previous_current_level
+        elif up_func is False:
+            up = False
+        else:
+            up = up_func
+
+        for key, value in base.gui_controller.key_map.items():
+            if isinstance(value, tuple):
+                if key in ("f", "d"):
+                    self.accept(value[0], down)
+                elif key in ("b", "u"):
+                    self.accept(value[0], up)
+
+    def ignore_keyboard_navigation(self):
+        for key, value in base.gui_controller.key_map.items():
+            if isinstance(value, tuple):
+                if key in ("f", "d", "b", "u"):
+                    self.ignore(value[0])
 
     def setItems(self):
         """
@@ -300,6 +343,9 @@ class DirectOptionMenu(DirectButton):
             if fCommand and self['command']:
                 # Pass any extra args to command
                 self['command'](*[item] + self['extraArgs'])
+
+        if self["selected"]:
+            self["selected"] = False
 
     def get(self):
         """ Get currently selected item """

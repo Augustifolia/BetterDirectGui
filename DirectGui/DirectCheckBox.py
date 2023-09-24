@@ -1,5 +1,8 @@
-from direct.gui.DirectGui import *
+from .DirectButton import DirectButton
 from panda3d.core import *
+import direct.gui.DirectGuiGlobals as DGG
+
+__all__ = ["DirectCheckBox"]
 
 
 class DirectCheckBox(DirectButton):
@@ -10,7 +13,7 @@ class DirectCheckBox(DirectButton):
 
     Uses an image swap rather than a text change to indicate state.
     """
-    def __init__(self, parent = None, **kw):
+    def __init__(self, parent=None, **kw):
 
         optiondefs = (
             # Define type of DirectGuiWidget
@@ -39,10 +42,26 @@ class DirectCheckBox(DirectButton):
         # Merge keyword options with default options
         self.defineoptions(kw, optiondefs)
 
-        DirectButton.__init__(self,parent)
+        DirectButton.__init__(self, parent)
 
         self.initialiseoptions(DirectCheckBox)
 
+        if base._do_bug_fixes:
+            if self['isChecked']:
+                self['image'] = self['checkedImage']
+            else:
+                self['image'] = self['uncheckedImage']
+
+            self.setImage()
+            if self["frameSize"] is None:
+                self.resetFrameSize()
+
+    def activate(self):
+        self["selected"] = False
+        self.commandFunc("")
+
+    def deactivate(self):
+        pass
 
     def commandFunc(self, event):
         self['isChecked'] = not self['isChecked']

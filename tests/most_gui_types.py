@@ -28,6 +28,10 @@ from panda3d.core import (
     TextNode
 )
 
+
+def test():
+    print(1)
+
 class GUI:
     def __init__(self, rootParent=None):
         
@@ -37,6 +41,7 @@ class GUI:
             text = 'button',
             parent=rootParent,
             pressEffect=1,
+            command=test
         )
         self.pg196.setTransparency(0)
 
@@ -62,6 +67,8 @@ class GUI:
             pos = LPoint3f(0.525, 0, 0.675),
             scale = LVecBase3f(0.1, 0.1, 0.1),
             parent=rootParent,
+            uncheckedImage="models/maps/circle.png",
+            checkedImage="models/maps/envir-bamboo.png"
         )
         self.pg2627.setTransparency(0)
 
@@ -69,7 +76,7 @@ class GUI:
             pos = LPoint3f(-0.9, 0, 0.5),
             scale = LVecBase3f(0.1, 0.1, 0.1),
             text = 'Checkbutton',
-            parent=rootParent,
+            parent=rootParent
         )
         self.pg3182.setTransparency(0)
 
@@ -79,6 +86,7 @@ class GUI:
             popupMarker_pos = None,
             text_align = 0,
             parent=rootParent,
+            items=["button1", "button2", "button3"]
         )
         self.pg5339.setTransparency(0)
 

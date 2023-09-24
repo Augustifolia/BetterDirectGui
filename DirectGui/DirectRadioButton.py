@@ -99,6 +99,13 @@ class DirectRadioButton(DirectButton):
         if needToCheck:
             self.check()
 
+    def activate(self):
+        self.commandFunc("")
+        self["selected"] = False
+
+    def deactivate(self):
+        pass
+
     # Override the resetFrameSize of DirectGuiWidget inorder to provide space for label
     def resetFrameSize(self):
         self.setFrameSize(fClearFrame = 1)
@@ -195,7 +202,6 @@ class DirectRadioButton(DirectButton):
                 newpos[2] += bbounds[2]-lbounds[2] + self['boxBorder'] + ibw[1]
 
             self.indicator.setPos(newpos[0], newpos[1], newpos[2])
-
 
     def commandFunc(self, event):
         if len(self['value']) == len(self['variable']) != 0:

@@ -12,6 +12,7 @@ from panda3d.core import *
 from .DirectButton import *
 from .DirectLabel import *
 
+
 class DirectCheckButton(DirectButton):
     """
     DirectCheckButton(parent) - Create a DirectGuiWidget which responds
@@ -70,6 +71,13 @@ class DirectCheckButton(DirectButton):
         if self['boxImageColor'] != None and self['boxImage'] !=  None:
             self.colors = [VBase4(0, 0, 0, 0), self['boxImageColor']]
             self.component('indicator')['image_color'] = VBase4(0, 0, 0, 0)
+
+    def activate(self):
+        self["selected"] = False
+        self.commandFunc("")
+
+    def deactivate(self):
+        pass
 
     # Override the resetFrameSize of DirectGuiWidget inorder to provide space for label
     def resetFrameSize(self):
@@ -167,7 +175,6 @@ class DirectCheckButton(DirectButton):
                 newpos[2] += bbounds[2]-lbounds[2] + self['boxBorder'] + ibw[1]
 
             self.indicator.setPos(newpos[0], newpos[1], newpos[2])
-
 
     def commandFunc(self, event):
         self['indicatorValue'] = 1 - self['indicatorValue']

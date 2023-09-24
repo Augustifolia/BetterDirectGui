@@ -16,6 +16,7 @@ import DirectScrolledFrame
 d = DirectScrolledFrame(borderWidth=(0, 0))
 """
 
+
 class DirectScrolledFrame(DirectFrame):
     """
     DirectScrolledFrame -- a special frame that uses DirectScrollBar to

@@ -147,6 +147,12 @@ class DirectEntry(DirectFrame):
         if self['initialText']:
             self.enterText(self['initialText'])
 
+    def activate(self):
+        self["focus"] = 1
+
+    def deactivate(self):
+        self["focus"] = 0
+
     def destroy(self):
         self.ignoreAll()
         self._autoCapListener.ignoreAll()
