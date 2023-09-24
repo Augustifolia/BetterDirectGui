@@ -1,5 +1,5 @@
 from direct.showbase.ShowBase import ShowBase
-import gui_controller
+import BetterDirectGui
 
 
 def test_most_types():
@@ -21,9 +21,11 @@ def test_scrolled_list():
 
 
 if __name__ == '__main__':
-    base = ShowBase()
-    gui_controller.GuiController(respect_sortOrder=False, do_bug_fixes=True)
+    base = ShowBase()  # init ShowBase
+    BetterDirectGui.init(respect_sortOrder=False, do_bug_fixes=True)  # init BetterDirectGui after ShowBase
+    base.gui_controller.update_key_map()
 
+    # create some gui
     run_test = 0
 
     if run_test == 0:
@@ -35,4 +37,5 @@ if __name__ == '__main__':
     elif run_test == 3:
         test_scrolled_list()
 
+    # start application
     base.run()

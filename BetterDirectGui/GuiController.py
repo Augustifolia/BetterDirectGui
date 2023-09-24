@@ -1,10 +1,15 @@
 from direct.showbase.DirectObject import DirectObject
 import panda3d.core as p3d
-from direct.showbase.ShowBase import ShowBase
+from BetterDirectGui import DirectGuiBase
 
-base: ShowBase
+from collections.abc import Iterable, Callable
 
-import DirectGuiBase
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from direct.showbase.ShowBase import ShowBase
+    base: ShowBase
+
+__all__ = ["GuiController"]
 
 
 class GuiController(DirectObject):
@@ -37,12 +42,29 @@ class GuiController(DirectObject):
 
         # todo not activate if user clicks enter while doing something else
         self.accept("enter", self.activate)
-        self.accept("f", self.test)
+        # self.accept("f", self.test)
 
         # base.messenger.toggle_verbose()
 
     def test(self):
         print(self.guiItems, "\n", DirectGuiBase.DirectGuiWidget.guiDict)
+
+    def update_key_map(self, key_map: dict[str, bool | Iterable | Callable]):
+        self.deactivate_keys()
+        for key, value in key_map.items():
+            if isinstance(value, bool) or isinstance(value, Iterable):
+                self.key_map[key] = value
+
+            elif isinstance(value, str):
+                self.key_map[key] = (value, self.key_map[key][1])
+
+            elif isinstance(value, Callable):
+                self.key_map[key] = (self.key_map[key][0], value)
+
+            else:
+                raise TypeError(f"unsupported type {type(value)} for the key_map")
+
+        self.activate_keys()
 
     def activate_keys(self):
         for key, value in self.key_map.items():

@@ -1,4 +1,4 @@
-from DirectGui import *
+from BetterDirectGui.DirectGui import *
 
 
 def test():

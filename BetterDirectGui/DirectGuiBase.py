@@ -1,8 +1,12 @@
 from __future__ import annotations
 import direct.gui.DirectGuiBase as DirectGuiBase
-from direct.showbase.ShowBase import ShowBase
 
-base: ShowBase
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from direct.showbase.ShowBase import ShowBase
+    base: ShowBase
+
+__all__ = ["DirectGuiWidget"]
 
 
 class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):

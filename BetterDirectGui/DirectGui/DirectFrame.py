@@ -20,7 +20,7 @@ __all__ = ['DirectFrame']
 
 from panda3d.core import *
 from direct.gui import DirectGuiGlobals as DGG
-from DirectGuiBase import *
+from BetterDirectGui.DirectGuiBase import *
 from direct.gui.OnscreenImage import OnscreenImage
 from direct.gui.OnscreenGeom import OnscreenGeom
 import sys

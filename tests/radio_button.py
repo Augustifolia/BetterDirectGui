@@ -1,4 +1,4 @@
-from DirectGui import *
+from BetterDirectGui.DirectGui import *
 
 v = [0]
 # Add some text
@@ -7,10 +7,12 @@ textObject = OnscreenText(text=bk_text, pos=(0.95, -0.95), scale=0.07,
                           fg=(1, 0.5, 0.5, 1),
                           mayChange=True)
 
+
 # Callback function to set  text
 def setText(status=None):
     bk_text = "CurrentValue : %s"%v
     textObject.setText(bk_text)
+
 
 # Add button
 buttons = [

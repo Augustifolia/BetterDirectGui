@@ -4,23 +4,7 @@
 # This file was created using the DirectGUI Designer
 
 from direct.gui import DirectGuiGlobals as DGG
-
-from DirectGui.DirectButton import DirectButton
-from DirectGui.DirectEntry import DirectEntry
-from DirectGui.DirectEntryScroll import DirectEntryScroll
-from DirectGui.DirectCheckBox import DirectCheckBox
-from DirectGui.DirectCheckButton import DirectCheckButton
-from DirectGui.DirectOptionMenu import DirectOptionMenu
-from DirectGui.DirectRadioButton import DirectRadioButton
-from DirectGui.DirectSlider import DirectSlider
-from DirectGui.DirectScrollBar import DirectScrollBar
-from DirectGui.DirectLabel import DirectLabel
-from DirectGui.DirectWaitBar import DirectWaitBar
-from DirectGui.DirectFrame import DirectFrame
-from DirectGui.DirectScrolledFrame import DirectScrolledFrame
-from DirectGui.DirectScrolledList import DirectScrolledList
-from DirectGui.DirectDialog import OkDialog
-
+from BetterDirectGui.DirectGui import *
 from panda3d.core import (
     LPoint3f,
     LVecBase3f,
@@ -31,6 +15,7 @@ from panda3d.core import (
 
 def test():
     print(1)
+
 
 class GUI:
     def __init__(self, rootParent=None):

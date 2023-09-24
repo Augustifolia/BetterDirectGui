@@ -1,4 +1,4 @@
-from DirectGui import *
+from BetterDirectGui.DirectGui import *
 
 b1 = DirectButton(text=("Button1", "click!", "roll", "disabled"),
                   text_scale=0.1, borderWidth=(0.01, 0.01),
