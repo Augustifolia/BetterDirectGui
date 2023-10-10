@@ -44,7 +44,7 @@ class DirectCheckButton(DirectButton):
             ('boxImageColor', None, None),
             ('boxRelief', 'sunken', None),
             ('selectable', True, None),
-            )
+        )
         # Merge keyword options with default options
         self.defineoptions(kw, optiondefs)
         # Initialize superclasses
@@ -72,9 +72,11 @@ class DirectCheckButton(DirectButton):
             self.colors = [VBase4(0, 0, 0, 0), self['boxImageColor']]
             self.component('indicator')['image_color'] = VBase4(0, 0, 0, 0)
 
+    def click(self):
+        self.commandFunc("")
+
     def activate(self):
         self["selected"] = False
-        self.commandFunc("")
 
     def deactivate(self):
         pass
@@ -142,7 +144,7 @@ class DirectCheckButton(DirectButton):
 
         # Set frame to new dimensions
         if ((frameType != PGFrameStyle.TNone) and
-            (frameType != PGFrameStyle.TFlat)):
+                (frameType != PGFrameStyle.TFlat)):
             bw = self['borderWidth']
         else:
             bw = (0, 0)

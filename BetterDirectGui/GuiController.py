@@ -20,11 +20,15 @@ class GuiController(DirectObject):
         self.guiItems = DirectGuiBase.DirectGuiWidget.guiDict
         base._do_bug_fixes = do_bug_fixes
 
+        self.skip_activate = False
+
         if base_np is None:
             base_np = base.aspect2d
         self.base_np = base_np
         self._current_selection: DirectGuiBase.DirectGuiWidget | None = None
         self._current_pos: DirectGuiBase.DirectGuiWidget | None = None
+
+        self._mouse_current_selection: DirectGuiBase.DirectGuiWidget | None = None
 
         self.key_map = {
             "u": ("arrow_up", self.parent_selectable_gui),  # 'up' move upward (by default upwards in the node-graph)
@@ -40,7 +44,7 @@ class GuiController(DirectObject):
 
         self.activate_keys()
 
-        # todo not activate if user clicks enter while doing something else
+        # todo not activate if user clicks enter while doing something else (in directEntry for example)
         self.accept("enter", self.activate)
         # self.accept("f", self.test)
 
@@ -79,9 +83,8 @@ class GuiController(DirectObject):
     def navigate_next(self, direction: str):
         if self.current_selection is None:
             self.default_implemetation(direction)
-            return
 
-        if hasattr(self.current_selection, "navigate_next"):
+        elif hasattr(self.current_selection, "navigate_next"):
             self.current_selection.navigate_next(direction)
 
         else:
@@ -138,6 +141,10 @@ class GuiController(DirectObject):
 
     def activate(self):
         if self.current_selection is None:
+            return
+
+        if self._mouse_current_selection is not None: # and self._mouse_current_selection is not self.current_selection:
+            print(self._mouse_current_selection, "mouse current selection")
             return
 
         c = self.current_selection

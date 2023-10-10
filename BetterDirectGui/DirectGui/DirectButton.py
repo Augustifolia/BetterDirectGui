@@ -47,7 +47,7 @@ class DirectButton(DirectFrame):
             # Do the text/graphics appear to move when the button is clicked
             ('pressEffect',     1,         DGG.INITOPT),
             ('selectable',      True,      None),
-            )
+        )
         # Merge keyword options with default options
         self.defineoptions(kw, optiondefs)
 
@@ -79,8 +79,10 @@ class DirectButton(DirectFrame):
                   Mat4.translateMat(centerX, 0, centerY)
             pressEffectNP.setMat(mat)
 
-    def activate(self):
+    def click(self):
         self.commandFunc("")
+
+    def activate(self):
         self["selected"] = False
 
     def deactivate(self):

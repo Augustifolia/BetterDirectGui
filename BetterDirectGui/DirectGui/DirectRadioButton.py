@@ -55,7 +55,7 @@ class DirectRadioButton(DirectButton):
             ('boxImageColor', VBase4(1, 1, 1, 1), None),
             ('boxRelief', None, None),
             ('selectable', True, None),
-            )
+        )
         # Merge keyword options with default options
         self.defineoptions(kw, optiondefs)
         # Initialize superclasses
@@ -99,8 +99,10 @@ class DirectRadioButton(DirectButton):
         if needToCheck:
             self.check()
 
-    def activate(self):
+    def click(self):
         self.commandFunc("")
+
+    def activate(self):
         self["selected"] = False
 
     def deactivate(self):
@@ -169,7 +171,7 @@ class DirectRadioButton(DirectButton):
 
         # Set frame to new dimensions
         if ((frameType != PGFrameStyle.TNone) and
-            (frameType != PGFrameStyle.TFlat)):
+                (frameType != PGFrameStyle.TFlat)):
             bw = self['borderWidth']
         else:
             bw = (0, 0)

@@ -22,6 +22,7 @@ ENTRY_FOCUS_STATE    = PGEntry.SFocus      # 0
 ENTRY_NO_FOCUS_STATE = PGEntry.SNoFocus    # 1
 ENTRY_INACTIVE_STATE = PGEntry.SInactive   # 2
 
+
 class DirectEntry(DirectFrame):
     """
     DirectEntry(parent) - Create a DirectGuiWidget which responds
@@ -84,7 +85,7 @@ class DirectEntry(DirectFrame):
             ('autoCapitalizeAllowPrefixes', DirectEntry.AllowCapNamePrefixes, None),
             ('autoCapitalizeForcePrefixes', DirectEntry.ForceCapNamePrefixes, None),
             ('selectable',      True,             None),
-            )
+        )
         # Merge keyword options with default options
         self.defineoptions(kw, optiondefs)
 
@@ -148,9 +149,11 @@ class DirectEntry(DirectFrame):
             self.enterText(self['initialText'])
 
     def activate(self):
+        print("activate")
         self["focus"] = 1
 
     def deactivate(self):
+        print("deactivate")
         self["focus"] = 0
 
     def destroy(self):
@@ -366,17 +369,17 @@ class DirectEntry(DirectFrame):
         vec_right = Vec3.right()
         vec_up = Vec3.up()
         left = (vec_right[0] * self.ll[0]
-              + vec_right[1] * self.ll[1]
-              + vec_right[2] * self.ll[2])
+                + vec_right[1] * self.ll[1]
+                + vec_right[2] * self.ll[2])
         right = (vec_right[0] * self.ur[0]
-               + vec_right[1] * self.ur[1]
-               + vec_right[2] * self.ur[2])
+                 + vec_right[1] * self.ur[1]
+                 + vec_right[2] * self.ur[2])
         bottom = (vec_up[0] * self.ll[0]
-                + vec_up[1] * self.ll[1]
-                + vec_up[2] * self.ll[2])
+                  + vec_up[1] * self.ll[1]
+                  + vec_up[2] * self.ll[2])
         top = (vec_up[0] * self.ur[0]
-             + vec_up[1] * self.ur[1]
-             + vec_up[2] * self.ur[2])
+               + vec_up[1] * self.ur[1]
+               + vec_up[2] * self.ur[2])
         self.ll = Point3(left, 0.0, bottom)
         self.ur = Point3(right, 0.0, top)
 

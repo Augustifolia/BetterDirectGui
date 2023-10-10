@@ -1,5 +1,6 @@
 from __future__ import annotations
 import direct.gui.DirectGuiBase as DirectGuiBase
+import direct.gui.DirectGuiGlobals as DGG
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -17,22 +18,22 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
         # False for disabled
         # To specify a jump explicitly, pass the object that should be jumped to
         navigationMap = {
-                "u": True,  # 'up' move upward (by default upwards in the node-graph)
-                "d": True,  # 'down' inverse of 'up'
-                "l": True,  # 'left' move left (to next gui node at the current level of the node-graph)
-                "r": True,  # 'right' inverse of 'left'
-                "i": False,  # 'inward'
-                "o": False,  # 'outward'
+            "u": True,  # 'up' move upward (by default upwards in the node-graph)
+            "d": True,  # 'down' inverse of 'up'
+            "l": True,  # 'left' move left (to next gui node at the current level of the node-graph)
+            "r": True,  # 'right' inverse of 'left'
+            "i": False,  # 'inward'
+            "o": False,  # 'outward'
 
-                "f": True,  # 'forward' move to next item (to next gui node in the node-graph)
-                "b": True  # 'backward' inverse of 'forward' (backward in the node-graph)
-            }
+            "f": True,  # 'forward' move to next item (to next gui node in the node-graph)
+            "b": True  # 'backward' inverse of 'forward' (backward in the node-graph)
+        }
 
         optiondefs = (
             ('selectable',     False,         None),
             ('selected',       False,         self.set_selected),
             ('navigationMap',  navigationMap, None)
-            )
+        )
         # Merge keyword options with default options
         self.defineoptions(kw, optiondefs)
 
@@ -43,6 +44,36 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
         self.initialiseoptions(DirectGuiWidget)
 
         base.gui_controller.guiItems[self.guiId] = self
+
+        self.bind(DGG.B1PRESS, self._set_active)
+
+    def bind(self, event, command, extraArgs = []):
+        if event == DGG.B1PRESS:
+            def func(*args, **kwargs):
+                if command is not self._set_active:
+                    command(*args, **kwargs)
+                self._set_active(*args, **kwargs)
+        else:
+            func = command
+
+        super().bind(event, func, extraArgs)
+
+    def unbind(self, event):
+        super().unbind(event)
+        if event == DGG.B1PRESS:
+            self.bind(DGG.B1PRESS, self._set_active)
+
+    def _set_active(self, event):
+        print(event)
+        print(base.gui_controller.current_selection)
+        if self["selectable"]:
+            if base.gui_controller.current_selection is not None:
+                base.gui_controller.current_selection.deactivate()
+
+            base.gui_controller.current_selection = self
+            base.gui_controller.skip_activate = True
+            base.gui_controller.activate()
+            base.gui_controller.skip_activate = False
 
     def destroy(self) -> None:
         super().destroy()
@@ -69,9 +100,16 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
     def set_selected(self):
         if self["selected"]:
             self.activate()
-
         else:
             self.deactivate()
+
+        # todo might need to add some method to focus in/out without activating the element to be able to select element without calling command func
+        if not base.gui_controller.skip_activate:
+            print("click")
+            self.click()
+
+    def click(self):
+        print("click")
 
     def activate(self):
         print("activate")

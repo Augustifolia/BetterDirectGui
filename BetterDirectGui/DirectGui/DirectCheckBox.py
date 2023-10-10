@@ -37,7 +37,7 @@ class DirectCheckBox(DirectButton):
             ('checkedImage',    None,      None),
             ('isChecked',       False,     None),
             ('selectable',      True,      None),
-            )
+        )
 
         # Merge keyword options with default options
         self.defineoptions(kw, optiondefs)
@@ -57,8 +57,8 @@ class DirectCheckBox(DirectButton):
                 self.resetFrameSize()
 
     def activate(self):
-        self["selected"] = False
         self.commandFunc("")
+        self["selected"] = False
 
     def deactivate(self):
         pass

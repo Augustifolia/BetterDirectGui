@@ -14,7 +14,7 @@ from panda3d.core import (
 
 
 def test():
-    print(1)
+    print("pressed button")
 
 
 class GUI:
