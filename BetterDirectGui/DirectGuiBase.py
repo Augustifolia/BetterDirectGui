@@ -65,8 +65,8 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
         print(event)
         print(base.gui_controller.current_selection)
         if self["selectable"]:
-            if base.gui_controller.current_selection is not None:
-                base.gui_controller.current_selection.deactivate()
+            if base.gui_controller.current_selection is not None and base.gui_controller.current_selection is not self:
+                base.gui_controller.current_selection["selected"] = False
 
             base.gui_controller.current_selection = self
             if skip_activate:

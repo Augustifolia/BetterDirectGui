@@ -28,8 +28,6 @@ class GuiController(DirectObject):
         self._current_selection: DirectGuiBase.DirectGuiWidget | None = None
         self._current_pos: DirectGuiBase.DirectGuiWidget | None = None
 
-        self._mouse_current_selection: DirectGuiBase.DirectGuiWidget | None = None
-
         self.key_map = {
             "u": ("arrow_up", self.parent_selectable_gui),  # 'up' move upward (by default upwards in the node-graph)
             "d": ("arrow_down", self.child_selectable_gui),  # 'down' inverse of 'up'
@@ -141,10 +139,6 @@ class GuiController(DirectObject):
 
     def activate(self):
         if self.current_selection is None:
-            return
-
-        if self._mouse_current_selection is not None: # and self._mouse_current_selection is not self.current_selection:
-            print(self._mouse_current_selection, "mouse current selection")
             return
 
         c = self.current_selection

@@ -133,10 +133,6 @@ class DirectScrolledList(DirectFrame):
         self.recordMaxHeight()
         self.scrollTo(0)
 
-        # DirectGuiBase.DirectGuiWidget.unbind(self, DGG.B1PRESS)
-        # self.incButton.bind(DGG.B1PRESS, self.incButton._set_active)
-        # self.decButton.bind(DGG.B1PRESS, self.decButton._set_active)
-
     def _inc_button_activate(self):
         self.scrollBy(1)
         self.incButton["selected"] = False

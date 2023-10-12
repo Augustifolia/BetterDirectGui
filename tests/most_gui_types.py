@@ -43,6 +43,7 @@ class GUI:
         self.pg2152.setTransparency(0)
         self.pg2153 = DirectEntryScroll(
             parent=rootParent,
+            scale=LVecBase3f(0.1, 0.1, 0.1),
             entry=self.pg2152,
         )
         self.pg2153.setTransparency(0)
@@ -170,6 +171,20 @@ class GUI:
             parent=rootParent,
         )
         self.pg16851.setTransparency(0)
+
+        l1 = DirectLabel(text="Test1", text_scale=0.1)
+        l2 = DirectLabel(text="Test2", text_scale=0.1)
+        l3 = DirectLabel(text="Test3", text_scale=0.1)
+        l4 = DirectLabel(text="Test4", text_scale=0.1)
+        l5 = DirectLabel(text="Test5", text_scale=0.1)
+        l6 = DirectLabel(text="Test6", text_scale=0.1)
+
+        self.pg16851.addItem(l1)
+        self.pg16851.addItem(l2)
+        self.pg16851.addItem(l3)
+        self.pg16851.addItem(l4)
+        self.pg16851.addItem(l5)
+        self.pg16851.addItem(l6)
 
         self.pg18888 = OkDialog(
             state = 'normal',
