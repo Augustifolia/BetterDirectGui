@@ -148,13 +148,20 @@ class DirectEntry(DirectFrame):
         if self['initialText']:
             self.enterText(self['initialText'])
 
+    # def _set_active(self, event, skip_activate=False):
+    #     super()._set_active(event, skip_activate)
+
+    def click(self):
+        self["focus"] = 1
+
+    def unclick(self):
+        self["focus"] = 0
+
     def activate(self):
         print("activate")
-        self["focus"] = 1
 
     def deactivate(self):
         print("deactivate")
-        self["focus"] = 0
 
     def destroy(self):
         self.ignoreAll()

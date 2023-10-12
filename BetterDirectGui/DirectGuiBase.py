@@ -43,14 +43,12 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
         # Call option initialization functions
         self.initialiseoptions(DirectGuiWidget)
 
-        base.gui_controller.guiItems[self.guiId] = self
-
         self.bind(DGG.B1PRESS, self._set_active)
 
     def bind(self, event, command, extraArgs = []):
         if event == DGG.B1PRESS:
             def func(*args, **kwargs):
-                if command is not self._set_active:
+                if command != self._set_active:
                     command(*args, **kwargs)
                 self._set_active(*args, **kwargs)
         else:
@@ -63,7 +61,7 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
         if event == DGG.B1PRESS:
             self.bind(DGG.B1PRESS, self._set_active)
 
-    def _set_active(self, event):
+    def _set_active(self, event, skip_activate=True):
         print(event)
         print(base.gui_controller.current_selection)
         if self["selectable"]:
@@ -71,13 +69,13 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
                 base.gui_controller.current_selection.deactivate()
 
             base.gui_controller.current_selection = self
-            base.gui_controller.skip_activate = True
-            base.gui_controller.activate()
-            base.gui_controller.skip_activate = False
-
-    def destroy(self) -> None:
-        super().destroy()
-        base.gui_controller.guiItems.pop(self.guiId)
+            if skip_activate:
+                base.gui_controller.skip_activate = True
+                print("call activate")
+                base.gui_controller.activate()
+                base.gui_controller.skip_activate = False
+            else:
+                base.gui_controller.activate()
 
     def navigate_next(self, direction: str = "f"):
         option = self["navigationMap"][direction]
@@ -100,16 +98,18 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
     def set_selected(self):
         if self["selected"]:
             self.activate()
+            if not base.gui_controller.skip_activate:
+                self.click()
         else:
             self.deactivate()
-
-        # todo might need to add some method to focus in/out without activating the element to be able to select element without calling command func
-        if not base.gui_controller.skip_activate:
-            print("click")
-            self.click()
+            if not base.gui_controller.skip_activate:
+                self.unclick()
 
     def click(self):
         print("click")
+
+    def unclick(self):
+        print("unclick")
 
     def activate(self):
         print("activate")

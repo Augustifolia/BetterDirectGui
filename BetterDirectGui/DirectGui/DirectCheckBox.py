@@ -56,8 +56,10 @@ class DirectCheckBox(DirectButton):
             if self["frameSize"] is None:
                 self.resetFrameSize()
 
-    def activate(self):
+    def click(self):
         self.commandFunc("")
+
+    def activate(self):
         self["selected"] = False
 
     def deactivate(self):

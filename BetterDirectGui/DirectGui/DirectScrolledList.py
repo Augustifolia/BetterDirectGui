@@ -14,6 +14,7 @@ from direct.task.Task import Task
 from .DirectFrame import *
 from .DirectButton import *
 import sys
+# from direct.gui import DirectGuiBase
 
 if sys.version_info >= (3,0):
     stringType = str
@@ -131,6 +132,10 @@ class DirectScrolledList(DirectFrame):
         self.initialiseoptions(DirectScrolledList)
         self.recordMaxHeight()
         self.scrollTo(0)
+
+        # DirectGuiBase.DirectGuiWidget.unbind(self, DGG.B1PRESS)
+        # self.incButton.bind(DGG.B1PRESS, self.incButton._set_active)
+        # self.decButton.bind(DGG.B1PRESS, self.decButton._set_active)
 
     def _inc_button_activate(self):
         self.scrollBy(1)
