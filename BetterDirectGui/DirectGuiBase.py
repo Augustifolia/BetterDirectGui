@@ -1,3 +1,4 @@
+"""Module with subclass of DirectGuiWidget that implements keyboard navigation."""
 from __future__ import annotations
 import direct.gui.DirectGuiBase as DirectGuiBase
 import direct.gui.DirectGuiGlobals as DGG
@@ -45,8 +46,12 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
 
         self.bind(DGG.B1PRESS, self._set_active)
 
-    def bind(self, event, command, extraArgs = []):
-        if event == DGG.B1PRESS:
+    def bind(self, event, command, extraArgs=[]):
+        """Bind the command (which should expect one arg) to the specified
+        event (such as ENTER, EXIT, B1PRESS, B1CLICK, etc.)
+        See DirectGuiGlobals for possible events
+        """
+        if event == DGG.B1PRESS:  # Make sure _set_active still is bound
             def func(*args, **kwargs):
                 if command != self._set_active:
                     command(*args, **kwargs)
@@ -57,8 +62,9 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
         super().bind(event, func, extraArgs)
 
     def unbind(self, event):
+        """Unbind the specified event"""
         super().unbind(event)
-        if event == DGG.B1PRESS:
+        if event == DGG.B1PRESS:  # Make sure _set_active is still bound
             self.bind(DGG.B1PRESS, self._set_active)
 
     def _set_active(self, event, skip_activate=True):
@@ -78,6 +84,11 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
                 base.gui_controller._activate()
 
     def navigate_next(self, direction: str = "f"):
+        """Navigate to next gui element in 'direction'.
+        If that element is not specified in navigationMap use default implementation to find the next element.
+
+        :param direction: A string matching a key from the navigationMap dict (i.e. "f", "b", "i", "o").
+        """
         option = self["navigationMap"][direction]
         if option is False:
             return
@@ -86,16 +97,19 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
             base.gui_controller._default_implementation(direction)
             return
 
-        base.gui_controller.current_selection = option
+        base.gui_controller.current_selection = option  # todo make sure this works (not tested)
 
-    def override_navigation_map(self, direction: str, key: str = None, next_item: DirectGuiWidget = None):
+    def override_navigation_map(self, direction: str, next_item: DirectGuiWidget):
+        """Change keys and values in the navigationMap.
+
+        :param direction: The direction to alter.
+        :param next_item: The element to select when navigating in that direction.
+        """
         nav_map = self["navigationMap"]
-        nav_map[direction] = (
-            key if key is not None else nav_map[direction][0],
-            next_item if next_item is not None else nav_map[direction][1]
-        )
+        nav_map[direction] = next_item
 
     def set_selected(self):
+        """Handle the state of self when selected/deselected."""
         if self["selected"]:
             self.activate()
             if not base.gui_controller._skip_activate:
@@ -105,20 +119,34 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
             if not base.gui_controller._skip_activate:
                 self.unclick()
 
-    def click(self):
+    def click(self):  # todo change name
+        """Do the stuff that would normally happen when element is clicked.
+        Is only called when navigating with keyboard.
+        """
         print("click")
 
-    def unclick(self):
+    def unclick(self):  # todo change name
+        """Do stuff that would normally happen when user clicks away from element.
+        Is only called when navigating with keyboard.
+        """
         print("unclick")
 
     def activate(self):
+        """Do the stuff that need to happen for element to be selected properly.
+        Is both called when element is clicked and when selected with keyboard.
+        """
         print("activate")
 
     def deactivate(self):
+        """Do the stuff that need to happen for element to be deselected properly.
+        Is both called when element is clicked and when selected with keyboard.
+        """
         print("deactivate")
 
     def highlight(self):
+        """Method to be called when element is selected to highlight it."""
         self.setColorScale(.5, 1, .5, 1)
 
     def unhighlight(self):
+        """Method to be called when element is deselected to unhighlight it."""
         self.setColorScale(1, 1, 1, 1)

@@ -1,3 +1,4 @@
+"""Module for handling the added gui functionality."""
 from direct.showbase.DirectObject import DirectObject
 import panda3d.core as p3d
 from BetterDirectGui import DirectGuiBase
@@ -13,6 +14,14 @@ __all__ = ["GuiController"]
 
 
 class GuiController(DirectObject):
+    """Class for handling the added gui functionality.
+
+    :param base_np: The NodePath that keyboard navigation should start from.
+    :param respect_sortOrder: If True: navigation will take into account the sort order of the gui elements
+     when selecting the next element to jump to.
+    :param do_bug_fixes: Changes some buggy behaviour in DirectGui.
+    """
+
     def __init__(self, base_np: p3d.NodePath = None, respect_sortOrder=True, do_bug_fixes=False):
         super().__init__()
         base.gui_controller = self
@@ -49,20 +58,29 @@ class GuiController(DirectObject):
 
     @property
     def key_map(self):
+        """The map used to decide what keyboard keys will activate which functions when navigating the gui."""
         return self._key_map
 
     @property
     def respect_sortOrder(self):
+        """If True: navigation will take into account the sort order of the gui elements
+        when selecting the next element to jump to.
+        """
         return self._respect_sortOrder
 
     @property
     def do_bug_fixes(self):
+        """Changes some buggy behaviour in DirectGui."""
         return base._do_bug_fixes
 
     def _test(self):
         print(self._guiItems, "\n", DirectGuiBase.DirectGuiWidget.guiDict)
 
     def update_key_map(self, key_map: dict[str, bool | Iterable | Callable]):
+        """Update 'self.key_map' with the values in 'key_map'.
+
+        :param key_map: Dict of the stuff in 'self.key_map' that you want to update.
+        """
         self.deactivate_keys()
         for key, value in key_map.items():
             if isinstance(value, bool) or isinstance(value, Iterable):
@@ -80,11 +98,13 @@ class GuiController(DirectObject):
         self.activate_keys()
 
     def activate_keys(self):
+        """Bind the keys in 'self.key_map' to the functions specified in 'self.key_map'."""
         for key, value in self.key_map.items():
             if isinstance(value, tuple):
                 self.accept(value[0], self._navigate_next, extraArgs=[key])
 
     def deactivate_keys(self):
+        """Unbind the keys in 'self.key_map'."""
         for key, value in self.key_map.items():
             if isinstance(value, tuple):
                 self.ignore(value[0])
@@ -108,6 +128,7 @@ class GuiController(DirectObject):
 
     @property
     def current_selection(self):
+        """The currently selected gui."""
         return self._current_selection
 
     @current_selection.setter
@@ -166,7 +187,8 @@ class GuiController(DirectObject):
         else:
             print("object has no option 'selected'")
 
-    def _get_guiId(self, np: p3d.NodePath) -> str | None:
+    @staticmethod
+    def _get_guiId(np: p3d.NodePath) -> str | None:
         name = np.getName().split("-")
         if len(name) < 2:
             return None
@@ -201,7 +223,8 @@ class GuiController(DirectObject):
         try:
             if gui["selectable"] and not np.isHidden() and not np.isStashed():
                 return True
-        except:
+
+        except Exception:
             return False
 
         return False
@@ -273,7 +296,7 @@ class GuiController(DirectObject):
         return children_list
 
     def _get_next_on_level(self, parent: p3d.NodePath = None,
-                          skip_np: p3d.NodePath = None) -> DirectGuiBase.DirectGuiWidget | None:
+                           skip_np: p3d.NodePath = None) -> DirectGuiBase.DirectGuiWidget | None:
 
         if parent is None:
             if self.current_selection is None:
@@ -305,7 +328,7 @@ class GuiController(DirectObject):
         return self._get_gui(next_item)
 
     def _get_previous_on_level(self, parent: p3d.NodePath = None,
-                              skip_np: p3d.NodePath = None) -> DirectGuiBase.DirectGuiWidget | None:
+                               skip_np: p3d.NodePath = None) -> DirectGuiBase.DirectGuiWidget | None:
 
         if parent is None:
             if self.current_selection is None:
