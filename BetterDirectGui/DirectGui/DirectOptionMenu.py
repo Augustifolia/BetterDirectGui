@@ -115,7 +115,7 @@ class DirectOptionMenu(DirectButton):
     def setup_keyboard_navigation(self):
         down_func = self["downFunc"]
         if down_func is True:
-            down = base.gui_controller.move_next_current_level
+            down = base.gui_controller._move_next_current_level
         elif down_func is False:
             down = False
         else:
@@ -123,7 +123,7 @@ class DirectOptionMenu(DirectButton):
 
         up_func = self["upFunc"]
         if up_func is True:
-            up = base.gui_controller.move_previous_current_level
+            up = base.gui_controller._move_previous_current_level
         elif up_func is False:
             up = False
         else:

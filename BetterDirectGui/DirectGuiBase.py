@@ -70,12 +70,12 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
 
             base.gui_controller.current_selection = self
             if skip_activate:
-                base.gui_controller.skip_activate = True
+                base.gui_controller._skip_activate = True
                 print("call activate")
-                base.gui_controller.activate()
-                base.gui_controller.skip_activate = False
+                base.gui_controller._activate()
+                base.gui_controller._skip_activate = False
             else:
-                base.gui_controller.activate()
+                base.gui_controller._activate()
 
     def navigate_next(self, direction: str = "f"):
         option = self["navigationMap"][direction]
@@ -83,7 +83,7 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
             return
 
         if option is True:
-            base.gui_controller.default_implemetation(direction)
+            base.gui_controller._default_implementation(direction)
             return
 
         base.gui_controller.current_selection = option
@@ -98,11 +98,11 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
     def set_selected(self):
         if self["selected"]:
             self.activate()
-            if not base.gui_controller.skip_activate:
+            if not base.gui_controller._skip_activate:
                 self.click()
         else:
             self.deactivate()
-            if not base.gui_controller.skip_activate:
+            if not base.gui_controller._skip_activate:
                 self.unclick()
 
     def click(self):
