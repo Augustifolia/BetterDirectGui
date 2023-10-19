@@ -42,3 +42,5 @@ def test_setup1():
     b3 = DirectButton(text="button3")
     b3.setScale(0.2)
     b3.setPos(0.7, 0, -0.5)
+
+    b1.override_navigation_map("f", b2)

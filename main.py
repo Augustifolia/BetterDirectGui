@@ -1,3 +1,4 @@
+"""Showcase and entrypoint for tests."""
 from direct.showbase.ShowBase import ShowBase
 import BetterDirectGui
 
@@ -26,7 +27,7 @@ if __name__ == '__main__':
     # base.gui_controller.update_key_map()
 
     # create some gui
-    run_test = 0
+    run_test = 1
 
     if run_test == 0:
         test_most_types()

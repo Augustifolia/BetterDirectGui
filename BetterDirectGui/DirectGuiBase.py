@@ -67,6 +67,10 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
         if event == DGG.B1PRESS:  # Make sure _set_active is still bound
             self.bind(DGG.B1PRESS, self._set_active)
 
+    def destroy(self):
+        super().destroy()
+        self["navigationMap"] = None
+
     def _set_active(self, event, skip_activate=True):
         print(event)
         print(base.gui_controller.current_selection)
@@ -107,6 +111,8 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
         """
         nav_map = self["navigationMap"]
         nav_map[direction] = next_item
+        opposite_direction = base.gui_controller.get_opposite_direction(direction)
+        next_item["navigationMap"][opposite_direction] = self
 
     def set_selected(self):
         """Handle the state of self when selected/deselected."""

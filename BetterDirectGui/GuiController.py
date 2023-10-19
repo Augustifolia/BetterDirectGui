@@ -73,6 +73,23 @@ class GuiController(DirectObject):
         """Changes some buggy behaviour in DirectGui."""
         return base._do_bug_fixes
 
+    def get_opposite_direction(self, direction: str) -> str:
+        """Get the opposite direction to the direction specified.
+        For example "f" returns "b" and "u" would return "d".
+        """
+        string_list = [key for key in self._key_map]
+        for index, value in enumerate(string_list):
+            string = value[0]
+            if direction != string:
+                continue
+
+            print(index, string)
+            if index % 2 == 0:
+                return string_list[index + 1]
+
+            else:
+                return string_list[index - 1]
+
     def _test(self):
         print(self._guiItems, "\n", DirectGuiBase.DirectGuiWidget.guiDict)
 
