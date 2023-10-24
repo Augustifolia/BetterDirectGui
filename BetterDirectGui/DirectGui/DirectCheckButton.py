@@ -45,6 +45,9 @@ class DirectCheckButton(DirectButton):
             ('boxRelief', 'sunken', None),
             ('selectable', True, None),
         )
+        # Merge keyword options with theme from gui_controller
+        kw = self.add_theming_options(kw, parent)
+
         # Merge keyword options with default options
         self.defineoptions(kw, optiondefs)
         # Initialize superclasses

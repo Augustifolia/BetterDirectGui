@@ -22,12 +22,32 @@ class GuiController(DirectObject):
     :param do_bug_fixes: Changes some buggy behaviour in DirectGui.
     """
 
-    def __init__(self, base_np: p3d.NodePath = None, respect_sortOrder=True, do_bug_fixes=False):
+    gui_themes_ = {
+        "DirectButton": dict(
+            borderWidth=(0.2, 0.2),
+            # frameColor=(.2, 1.0, 1.0, 1.0),
+            pad=(0.2, 0.2),
+            pos=(0, 0, 0),
+            hpr=(0, 0, 30),
+            scale=(0.1, 0.1, 0.1),
+            text='button',
+        ),
+        "DirectFrame": dict(
+            # frameSize=(-1, 1, -0.5, 0.5),
+            text="frame"
+        )
+    }
+    gui_themes = None
+
+    def __init__(self, base_np: p3d.NodePath = None, respect_sortOrder=True, do_bug_fixes=False, theme=None):
         super().__init__()
         base.gui_controller = self
         self._respect_sortOrder = respect_sortOrder
         self._guiItems = DirectGuiBase.DirectGuiWidget.guiDict
-        base._do_bug_fixes = do_bug_fixes
+        self._do_bug_fixes = do_bug_fixes
+        self._do_theming = True
+        if theme is not None:
+            self.set_theme(theme)
 
         self._skip_activate = False
 
@@ -56,6 +76,12 @@ class GuiController(DirectObject):
 
         # base.messenger.toggle_verbose()
 
+    def set_theme(self, theme: dict):
+        self.gui_themes = theme
+
+    def clear_theme(self):
+        self.gui_themes = None
+
     @property
     def key_map(self):
         """The map used to decide what keyboard keys will activate which functions when navigating the gui."""
@@ -71,7 +97,7 @@ class GuiController(DirectObject):
     @property
     def do_bug_fixes(self):
         """Changes some buggy behaviour in DirectGui."""
-        return base._do_bug_fixes
+        return self._do_bug_fixes
 
     def get_opposite_direction(self, direction: str) -> str:
         """Get the opposite direction to the direction specified.
@@ -222,7 +248,10 @@ class GuiController(DirectObject):
 
         return None
 
-    def _is_gui(self, np: p3d.NodePath) -> bool:
+    def _is_gui(self, np: p3d.NodePath | None) -> bool:
+        if np is None:
+            return False
+
         name = np.getName().split("-")
         if len(name) < 2:
             return False

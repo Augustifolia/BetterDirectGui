@@ -33,6 +33,9 @@ class DirectLabel(DirectFrame):
             ('state',           self.inactiveInitState, None),
             ('activeState',     0,         self.setActiveState),
             )
+        # Merge keyword options with theme from gui_controller
+        kw = self.add_theming_options(kw, parent)
+
         # Merge keyword options with default options
         self.defineoptions(kw, optiondefs)
 

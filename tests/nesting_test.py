@@ -43,4 +43,23 @@ def test_setup1():
     b3.setScale(0.2)
     b3.setPos(0.7, 0, -0.5)
 
-    b1.override_navigation_map("f", b2)
+    theme = {
+        "DirectButton": dict(
+            borderWidth=(0.2, 0.2),
+            frameColor=(.2, 1.0, 1.0, 1.0),
+            pad=(0.2, 0.2),
+            pos=(0, 0, 0),
+            hpr=(0, 0, 0),
+            scale=(0.1, 0.1, 0.1),
+            text='button',
+        ),
+        "DirectFrame": dict(
+            # frameSize=(-1, 1, -1, 1),
+            frameColor=(.2, 1, 1, 1),
+            text=""
+        )
+    }
+
+    # b1.override_navigation_map("f", b2)
+    f1.set_theme(theme)
+    f1.clear_theme()

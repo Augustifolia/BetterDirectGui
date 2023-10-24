@@ -38,6 +38,8 @@ class DirectCheckBox(DirectButton):
             ('isChecked',       False,     None),
             ('selectable',      True,      None),
         )
+        # Merge keyword options with theme from gui_controller
+        kw = self.add_theming_options(kw, parent)
 
         # Merge keyword options with default options
         self.defineoptions(kw, optiondefs)
@@ -46,7 +48,7 @@ class DirectCheckBox(DirectButton):
 
         self.initialiseoptions(DirectCheckBox)
 
-        if base._do_bug_fixes:
+        if base.gui_controller._do_bug_fixes:
             if self['isChecked']:
                 self['image'] = self['checkedImage']
             else:

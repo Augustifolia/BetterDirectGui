@@ -3,6 +3,8 @@ from __future__ import annotations
 import direct.gui.DirectGuiBase as DirectGuiBase
 import direct.gui.DirectGuiGlobals as DGG
 
+from typing import Any
+
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from direct.showbase.ShowBase import ShowBase
@@ -35,6 +37,15 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
             ('selected',       False,         self.set_selected),
             ('navigationMap',  navigationMap, None)
         )
+        if not hasattr(self, "_kw"):
+            self._kw = {}
+        if not hasattr(self, "_theme"):
+            self._theme: dict[str, Any] | None = None
+            self._theme_priority = -1
+
+        # Merge keyword options with theme from gui_controller
+        kw = self.add_theming_options(kw, parent)
+
         # Merge keyword options with default options
         self.defineoptions(kw, optiondefs)
 
@@ -45,6 +56,72 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
         self.initialiseoptions(DirectGuiWidget)
 
         self.bind(DGG.B1PRESS, self._set_active)
+
+    def set_theme(self, theme: dict, priority=0):
+        print(self, self._kw)
+        if priority <= self._theme_priority:
+            return
+
+        self._theme_priority = priority
+        self._theme = theme
+        if type(self).__name__ in theme:
+            gui_theme = theme[type(self).__name__]
+            for key, value in gui_theme.items():
+                if key in self._kw:
+                    continue
+
+                self[key] = value
+
+        children = base.gui_controller._get_gui_children(self)
+        for child in children:
+            child.set_theme(theme)
+
+    def clear_theme(self):
+        if self._theme is None:
+            return
+
+        for name, default, func in self.options():
+            if name in self._theme[type(self).__name__] and name not in self._kw:
+                self[name] = default
+
+        self._theme_priority = -1
+        self._theme = None
+
+        children = base.gui_controller._get_gui_children(self)
+        for child in children:
+            child.clear_theme()
+
+    def add_theming_options(self, kw: dict, parent: DirectGuiWidget | None):
+        """Merge kw with the theming specified in guiController.
+
+        :param parent: The parent element of self
+        :param kw: The keywords given by the user.
+        :return: kw
+        """
+        if not hasattr(self, "_kw"):
+            self._kw = kw.copy()
+
+        if not base.gui_controller._do_theming:
+            return kw
+
+        name = type(self).__name__
+        if base.gui_controller._is_gui(parent) and parent._theme is not None:
+            themes = parent._theme
+            self._theme = themes
+
+        elif base.gui_controller.gui_themes is not None and name in base.gui_controller.gui_themes:
+            themes = base.gui_controller.gui_themes
+
+        else:
+            return kw
+
+        theme = themes[name]
+        kwargs = kw.copy()
+        for key, value in theme.items():
+            if key not in kwargs:
+                kwargs[key] = value
+
+        return kwargs
 
     def bind(self, event, command, extraArgs=[]):
         """Bind the command (which should expect one arg) to the specified

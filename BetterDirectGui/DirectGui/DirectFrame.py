@@ -52,6 +52,10 @@ class DirectFrame(DirectGuiWidget):
             # (OnscreenText.py) to 1
             ('textMayChange',  1,          None),
             )
+
+        # Merge keyword options with theme from gui_controller
+        kw = self.add_theming_options(kw, parent)
+
         # Merge keyword options with default options
         self.defineoptions(kw, optiondefs,
                            dynamicGroups = DirectFrame.DefDynGroups)

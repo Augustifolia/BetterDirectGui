@@ -56,6 +56,9 @@ class DirectSlider(DirectFrame):
                 ('frameVisibleScale', (1, 0.25),        None),
                 )
 
+        # Merge keyword options with theme from gui_controller
+        kw = self.add_theming_options(kw, parent)
+
         # Merge keyword options with default options
         self.defineoptions(kw, optiondefs)
 

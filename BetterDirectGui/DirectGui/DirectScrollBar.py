@@ -54,6 +54,9 @@ class DirectScrollBar(DirectFrame):
                 ('frameSize',      (-0.5, 0.5, -0.04, 0.04),  None),
                 )
 
+        # Merge keyword options with theme from gui_controller
+        kw = self.add_theming_options(kw, parent)
+
         # Merge keyword options with default options
         self.defineoptions(kw, optiondefs)
 
