@@ -82,6 +82,8 @@ class DirectSlider(DirectFrame):
         # setup keyboard navigation for the thumb
         self.thumb.activate = self.activate
         self.thumb.deactivate = self.deactivate
+        self.thumb.show_click = self.thumb_show_click
+        self.thumb.show_unclick = self.thumb_show_unclick
 
         # Bind command function
         self.bind(DGG.ADJUST, self.commandFunc)
@@ -94,6 +96,16 @@ class DirectSlider(DirectFrame):
 
     def deactivate(self):
         self.ignore_keyboard_navigation()
+
+    def thumb_show_click(self):
+        self._scale = VBase4(self.thumb.guiItem.get_frame())
+        self.thumb["frameSize"] = self._scale * 0.9
+
+    def thumb_show_unclick(self):
+        def set_scale(scale):
+            self.thumb["frameSize"] = scale
+        if hasattr(self, "_scale"):
+            self.do_method_later(0.1, set_scale, "unclick", [self._scale])
 
     def setup_keyboard_navigation(self):
         # todo check orientation of the slider to determine scroll direction

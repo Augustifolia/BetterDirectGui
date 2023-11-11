@@ -60,6 +60,7 @@ class DirectCheckBox(DirectButton):
 
     def click(self):
         self.commandFunc("")
+        self.show_click()
 
     def activate(self):
         self["selected"] = False

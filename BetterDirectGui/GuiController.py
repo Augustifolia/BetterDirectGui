@@ -81,6 +81,8 @@ class GuiController(DirectObject):
             self.activate_keys()
             self.accept("enter", self._activate)
 
+        self.highlight_color = (0.7, 0.7, 0.7, 1)
+
     def set_theme(self, theme: dict, priority: int = 0):
         """Set the global theme. Theme is set for all DirectGui objects that are children of 'self.base_np'.
 
@@ -138,7 +140,6 @@ class GuiController(DirectObject):
             if direction != string:
                 continue
 
-            print(index, string)
             if index % 2 == 0:
                 return string_list[index + 1]
 
@@ -231,11 +232,15 @@ class GuiController(DirectObject):
 
     @staticmethod
     def _highlight(gui: DirectGuiBase.DirectGuiWidget):
-        gui.setColorScale(.5, 1, .5, 1)
+        gui._color_scale = gui.getColorScale()
+        gui.setColorScale(*base.gui_controller.highlight_color)
 
     @staticmethod
     def _unhighlight(gui: DirectGuiBase.DirectGuiWidget):
-        gui.setColorScale(1, 1, 1, 1)
+        if hasattr(gui, "_color_scale"):
+            gui.set_color_scale(gui._color_scale)
+        else:
+            gui.setColorScale(1, 1, 1, 1)
 
     @staticmethod
     def _has_option(gui: DirectGuiBase.DirectGuiWidget, option: str) -> bool:
@@ -243,10 +248,8 @@ class GuiController(DirectObject):
             gui[option]
 
         except Exception:
-            print(option, "ex")
             return False
 
-        print(option, "y")
         return True
 
     def _activate(self):
@@ -256,11 +259,10 @@ class GuiController(DirectObject):
         c = self.current_selection
         if self._has_option(c, "selected"):
             c["selected"] = not c["selected"]
+            print("selected" if c["selected"] else "unselected", c)
             if c["selected"]:
-                print("sel")
                 self.deactivate_keys()
             else:
-                print("unsel")
                 self.activate_keys()
 
         else:
@@ -578,7 +580,6 @@ class GuiController(DirectObject):
     def _child_selectable_gui(self):
         if self.current_selection is None:
             child = self._get_next_on_level()
-            print(child)
             if child is None:
                 return
 

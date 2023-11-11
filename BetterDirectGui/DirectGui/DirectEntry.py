@@ -153,6 +153,7 @@ class DirectEntry(DirectFrame):
 
     def click(self):
         self["focus"] = 1
+        self.show_click()
 
     def activate(self):
         print("activate")

@@ -63,7 +63,6 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
         :param theme: The new theme.
         :param priority: Requires a higher value than the current themes priority to override.
         """
-        print(self, self._kw)
         if priority <= self._theme_priority:
             return
 
@@ -168,7 +167,6 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
             base.gui_controller.current_selection = self
             if skip_activate:
                 base.gui_controller._skip_activate = True
-                print("call activate")
                 base.gui_controller._activate()
                 base.gui_controller._skip_activate = False
             else:
@@ -204,25 +202,35 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
     def set_selected(self):
         """Handle the state of self when selected/deselected."""
         if self["selected"]:
-            self.activate()
             if not base.gui_controller._skip_activate:
                 self.click()
+            self.activate()
         else:
-            self.deactivate()
             if not base.gui_controller._skip_activate:
                 self.unclick()
+            self.deactivate()
 
-    def click(self):  # todo change name
+    def click(self):
         """Do the stuff that would normally happen when element is clicked.
         Is only called when navigating with keyboard.
         """
-        print("click")
+        self.show_click()
 
-    def unclick(self):  # todo change name
+    def show_click(self):
+        """Show that the element is selected by changing its scale."""
+        self._scale = self.get_scale()
+        self.set_scale(self._scale * 0.95)
+
+    def unclick(self):
         """Do stuff that would normally happen when user clicks away from element.
         Is only called when navigating with keyboard.
         """
-        print("unclick")
+        self.show_unclick()
+
+    def show_unclick(self):
+        """Reset the scale changed in show_click."""
+        if hasattr(self, "_scale"):
+            self.do_method_later(0.1, self.set_scale, "unclick", [self._scale])
 
     def activate(self):
         """Do the stuff that need to happen for element to be selected properly.
@@ -237,9 +245,15 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
         print("deactivate")
 
     def highlight(self):
-        """Method to be called when element is selected to highlight it."""
-        self.setColorScale(.5, 1, .5, 1)
+        """Method to be called when element is the "current_selection"
+        (not selected, just the current node for the GuiController) to highlight it."""
+        self._color_scale = self.getColorScale()
+        self.setColorScale(*base.gui_controller.highlight_color)
 
     def unhighlight(self):
-        """Method to be called when element is deselected to unhighlight it."""
-        self.setColorScale(1, 1, 1, 1)
+        """Method to be called when element is no longer the "current_selection"
+        (not selected, just the current node for the GuiController) to unhighlight it."""
+        if hasattr(self, "_color_scale"):
+            self.set_color_scale(self._color_scale)
+        else:
+            self.setColorScale(1, 1, 1, 1)
