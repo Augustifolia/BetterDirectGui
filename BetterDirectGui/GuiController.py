@@ -1,4 +1,6 @@
 """Module for handling the added gui functionality."""
+from __future__ import annotations
+
 from direct.showbase.DirectObject import DirectObject
 import panda3d.core as p3d
 from BetterDirectGui import DirectGuiBase
