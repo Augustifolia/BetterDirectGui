@@ -22,8 +22,11 @@ class GuiController(DirectObject):
     :param respect_sortOrder: If True: navigation will take into account the sort order of the gui elements
      when selecting the next element to jump to.
     :param do_bug_fixes: Changes some buggy behaviour in DirectGui.
+    :param theme: The global theme used by all elements that are children of base_np.
+    :param do_keyboard_navigation: Chose weather keyboard navigation is enabled.
     """
 
+    # An example theme (useful for testing)
     gui_themes_ = {
         "DirectButton": dict(
             borderWidth=(0.2, 0.2),
@@ -39,9 +42,11 @@ class GuiController(DirectObject):
             text="frame"
         )
     }
-    gui_themes = None
+    gui_themes = None  # By default, no theme
+    gui_theme_priority = -1
 
-    def __init__(self, base_np: p3d.NodePath = None, respect_sortOrder=True, do_bug_fixes=False, theme=None):
+    def __init__(self, base_np: p3d.NodePath = None, respect_sortOrder=True,
+                 do_bug_fixes=False, theme=None, do_keyboard_navigation=True):
         super().__init__()
         base.gui_controller = self
         self._respect_sortOrder = respect_sortOrder
@@ -70,19 +75,31 @@ class GuiController(DirectObject):
             "f": ("tab", self._next_selectable_gui),  # 'forward' move to next item (to next gui node in the node-graph)
             "b": ("shift-tab", self._previous_selectable_gui)  # 'backward' inverse of 'forward' (backward in the node-graph)
         }
+        self._do_keyboard_navigation = do_keyboard_navigation
 
-        self.activate_keys()
+        if do_keyboard_navigation:
+            self.activate_keys()
+            self.accept("enter", self._activate)
 
-        self.accept("enter", self._activate)
-        # self.accept("f", self._test)
+    def set_theme(self, theme: dict, priority: int = 0):
+        """Set the global theme. Theme is set for all DirectGui objects that are children of 'self.base_np'.
 
-        # base.messenger.toggle_verbose()
-
-    def set_theme(self, theme: dict):
+        :param theme: The new theme to set.
+        :param priority: Priority value to override previous theme.
+        """
         self.gui_themes = theme
+        self.gui_theme_priority = priority
+        children = self._get_gui_children(self._base_np)
+        for child in children:
+            child.set_theme(theme, priority)
 
     def clear_theme(self):
+        """Clear the global theme."""
         self.gui_themes = None
+        self.gui_theme_priority = -1
+        children = self._get_gui_children(self._base_np)
+        for child in children:
+            child.clear_theme()
 
     @property
     def key_map(self):
@@ -100,6 +117,16 @@ class GuiController(DirectObject):
     def do_bug_fixes(self):
         """Changes some buggy behaviour in DirectGui."""
         return self._do_bug_fixes
+
+    @property
+    def base_np(self):
+        """The base nodepath for keyboard navigation and global theming. By default, it is aspect2d."""
+        return self._base_np
+
+    @property
+    def do_keyboard_navigation(self):
+        """Bool for if keyboard navigation is enabled."""
+        return self._do_keyboard_navigation
 
     def get_opposite_direction(self, direction: str) -> str:
         """Get the opposite direction to the direction specified.
@@ -141,6 +168,13 @@ class GuiController(DirectObject):
                 raise TypeError(f"unsupported type {type(value)} for the key_map")
 
         self.activate_keys()
+
+    def update_activation_key(self, key: str):
+        """Used to set the key to press to activate the currently selected gui element.
+
+        :param key: The new key.
+        """
+        self.accept(key, self._activate)
 
     def activate_keys(self):
         """Bind the keys in 'self.key_map' to the functions specified in 'self.key_map'."""
@@ -319,7 +353,7 @@ class GuiController(DirectObject):
 
         return False
 
-    def _get_gui_children(self, np: p3d.NodePath) -> list[p3d.NodePath]:
+    def _get_gui_children(self, np: p3d.NodePath) -> list[DirectGuiBase]:
         children = np.get_children()
         children_list = []
         for child in children:

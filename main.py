@@ -23,7 +23,7 @@ def test_scrolled_list():
 
 if __name__ == '__main__':
     base = ShowBase()  # init ShowBase
-    BetterDirectGui.init(respect_sortOrder=False, do_bug_fixes=True)  # init BetterDirectGui after ShowBase
+    BetterDirectGui.init(respect_sortOrder=False, do_bug_fixes=True, do_keyboard_navigation=True)  # init BetterDirectGui after ShowBase
     # base.gui_controller.update_key_map()
 
     # create some gui

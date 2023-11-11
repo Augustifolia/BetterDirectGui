@@ -58,6 +58,11 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
         self.bind(DGG.B1PRESS, self._set_active)
 
     def set_theme(self, theme: dict, priority=0):
+        """Set theme of this element and its children to the specified theme.
+
+        :param theme: The new theme.
+        :param priority: Requires a higher value than the current themes priority to override.
+        """
         print(self, self._kw)
         if priority <= self._theme_priority:
             return
@@ -74,9 +79,10 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
 
         children = base.gui_controller._get_gui_children(self)
         for child in children:
-            child.set_theme(theme)
+            child.set_theme(theme, priority)
 
     def clear_theme(self):
+        """Remove the theming options from this element and its children."""
         if self._theme is None:
             return
 
@@ -108,9 +114,12 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
         if base.gui_controller._is_gui(parent) and parent._theme is not None:
             themes = parent._theme
             self._theme = themes
+            self._theme_priority = parent._theme_priority
 
         elif base.gui_controller.gui_themes is not None and name in base.gui_controller.gui_themes:
             themes = base.gui_controller.gui_themes
+            self._theme = themes
+            self._theme_priority = base.gui_controller.gui_theme_priority
 
         else:
             return kw
@@ -149,8 +158,9 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
         self["navigationMap"] = None
 
     def _set_active(self, event, skip_activate=True):
-        print(event)
-        print(base.gui_controller.current_selection)
+        if not base.gui_controller.do_keyboard_navigation:
+            return
+
         if self["selectable"]:
             if base.gui_controller.current_selection is not None and base.gui_controller.current_selection is not self:
                 base.gui_controller.current_selection["selected"] = False
@@ -178,7 +188,7 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
             base.gui_controller._default_implementation(direction)
             return
 
-        base.gui_controller.current_selection = option  # todo make sure this works (not tested)
+        base.gui_controller.current_selection = option
 
     def override_navigation_map(self, direction: str, next_item: DirectGuiWidget):
         """Change keys and values in the navigationMap.

@@ -49,7 +49,7 @@ def test_setup1():
             frameColor=(.2, 1.0, 1.0, 1.0),
             pad=(0.2, 0.2),
             pos=(0, 0, 0),
-            hpr=(0, 0, 0),
+            hpr=(0, 0, -30),
             scale=(0.1, 0.1, 0.1),
             text='button',
         ),
@@ -61,5 +61,5 @@ def test_setup1():
     }
 
     # b1.override_navigation_map("f", b2)
-    f1.set_theme(theme)
-    f1.clear_theme()
+    # f1.set_theme(theme, 1)
+    # f1.clear_theme()
