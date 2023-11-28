@@ -308,7 +308,8 @@ class GuiController(DirectObject):
             if gui["selectable"] and not np.isHidden() and not np.isStashed():
                 return True
 
-        except Exception:
+        except Exception as e:
+            print(f"Warning: {e}. You might not be using the gui-classes from BetterDirectGui.DirectGui")
             return False
 
         return False
@@ -502,7 +503,11 @@ class GuiController(DirectObject):
 
     def _move_next_current_level(self):
         if self.current_selection is None:
-            next_item = self._get_selectable_gui_children(self._base_np)[0]
+            next_item = self._get_selectable_gui_children(self._base_np)
+            if next_item:
+                next_item = next_item[0]
+            else:
+                return
             if next_item is None:
                 return
 
@@ -523,7 +528,11 @@ class GuiController(DirectObject):
 
     def _move_previous_current_level(self):
         if self.current_selection is None:
-            next_item = self._get_selectable_gui_children(self._base_np)[-1]
+            next_item = self._get_selectable_gui_children(self._base_np)
+            if next_item:
+                next_item = next_item[-1]
+            else:
+                return
             if next_item is None:
                 return
 

@@ -108,15 +108,19 @@ class DirectSlider(DirectFrame):
             self.do_method_later(0.1, set_scale, "unclick", [self._scale])
 
     def setup_keyboard_navigation(self):
-        # todo check orientation of the slider to determine scroll direction
+        forward = 1
+        backward = -1
+        if self["orientation"] == DGG.VERTICAL:
+            forward, backward = backward, forward
+
         for key, value in base.gui_controller.key_map.items():
             if isinstance(value, tuple):
                 if key in ("d", "r"):
-                    self.accept(value[0], self.scrollStep, extraArgs=[1])
-                    self.accept(value[0] + "-repeat", self.scrollStep, extraArgs=[1])
+                    self.accept(value[0], self.scrollStep, extraArgs=[forward])
+                    self.accept(value[0] + "-repeat", self.scrollStep, extraArgs=[forward])
                 elif key in ("u", "l"):
-                    self.accept(value[0], self.scrollStep, extraArgs=[-1])
-                    self.accept(value[0] + "-repeat", self.scrollStep, extraArgs=[-1])
+                    self.accept(value[0], self.scrollStep, extraArgs=[backward])
+                    self.accept(value[0] + "-repeat", self.scrollStep, extraArgs=[backward])
 
     def ignore_keyboard_navigation(self):
         for key, value in base.gui_controller.key_map.items():

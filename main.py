@@ -21,6 +21,11 @@ def test_scrolled_list():
     import tests.scrolled_list
 
 
+def test_inverted_scrollbar():
+    from tests.inverted_scrollbars import GUI
+    GUI()
+
+
 if __name__ == '__main__':
     base = ShowBase()  # init ShowBase
     BetterDirectGui.init(respect_sortOrder=False, do_bug_fixes=True, do_keyboard_navigation=True)  # init BetterDirectGui after ShowBase
@@ -37,6 +42,10 @@ if __name__ == '__main__':
         test_radio_button()
     elif run_test == 3:
         test_scrolled_list()
+    elif run_test == 4:
+        test_inverted_scrollbar()
+    elif run_test == 5:
+        pass  # test empty scene
 
     # start application
     base.run()
