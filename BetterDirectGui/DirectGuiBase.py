@@ -2,6 +2,7 @@
 from __future__ import annotations
 import direct.gui.DirectGuiBase as DirectGuiBase
 import direct.gui.DirectGuiGlobals as DGG
+import panda3d.core as p3d
 
 from typing import Any
 
@@ -35,7 +36,10 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
         optiondefs = (
             ('selectable',     False,         None),
             ('selected',       False,         self.set_selected),
-            ('navigationMap',  navigationMap, None)
+            ('navigationMap',  navigationMap, None),
+            ('frameTextureCenter',  None,  self.update_frame_texture),
+            ('frameTextureEdge',  None,  self.update_frame_texture),
+            ('frameTextureCorner',  None,  self.update_frame_texture)
         )
         if not hasattr(self, "_kw"):
             self._kw = {}
@@ -56,6 +60,74 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
         self.initialiseoptions(DirectGuiWidget)
 
         self.bind(DGG.B1PRESS, self._set_active)
+        self.update_frame_texture()
+
+    def setFrameSize(self, fClearFrame = 0):
+        super().setFrameSize(fClearFrame)
+        # if "frameSize" in self._optionInfo and self["frameSize"] is None:
+        #     self._optionInfo["frameSize"][DGG._OPT_VALUE] = list(self.bounds)
+#
+    def initialiseoptions(self, myClass):
+        super().initialiseoptions(myClass)
+        self.fix_frame_size()
+
+    def fix_frame_size(self):
+        # return
+        if self.guiItem.hasFrame() and self["frameSize"] is None:
+            print(self["frameSize"])
+            # self["frameSize"] = list(self.guiItem.getFrame())
+            self._optionInfo["frameSize"][DGG._OPT_VALUE] = list(self.guiItem.getFrame())
+            print(self["frameSize"])
+
+    def setBorderWidth(self):
+        super().setBorderWidth()
+        self.update_frame_texture()
+
+    def update_frame_texture(self):
+        # this might be a single texture or a list of textures (does not currently support several textures)
+        center = self['frameTextureCenter']
+        edge = self['frameTextureEdge']
+        corner = self['frameTextureCorner']
+        if not all((center, edge, corner)):
+            self.setShaderOff(1)
+            for node in self.stateNodePath:
+                node.setShaderOff(1)
+            return
+
+        tex_dict = {"center": center, "edge": edge, "corner": corner}
+        for key, tex in tex_dict.items():
+            if isinstance(tex, str):
+                tex = base.loader.loadTexture(tex)
+                tex_dict[key] = tex
+            elif isinstance(tex, p3d.Texture):
+                pass
+            else:
+                print(f"{tex=} has invalid type: {type(tex)}")
+
+        if self["frameSize"] is not None and self["frameSize"] != (0, 0, 0, 0):
+            size = self["frameSize"]
+
+        elif self.guiItem.hasFrame():
+            size = self.guiItem.getFrame()
+        else:
+            size = self.getBounds()
+
+        aspect_ratio = (size[1] - size[0])/(size[3] - size[2])
+
+        shader = p3d.Shader.load(p3d.Shader.SL_GLSL,
+                                 vertex="BetterDirectGui/Shaders/frame.vert",
+                                 fragment="BetterDirectGui/Shaders/frame.frag")
+        self.setShader(shader)
+        self.setShaderInputs(**tex_dict,
+                             borderWidth=self["borderWidth"],
+                             size=aspect_ratio)
+        for node in self.stateNodePath:
+            # node.setShader(shader)
+            # node.setShaderInputs(**tex_dict,
+            #                      borderWidth=self["borderWidth"],
+            #                      size=aspect_ratio)
+            for child in node.children:
+                child.setShaderOff(1)
 
     def set_theme(self, theme: dict, priority=0):
         """Set theme of this element and its children to the specified theme.
@@ -153,8 +225,8 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
             self.bind(DGG.B1PRESS, self._set_active)
 
     def destroy(self):
-        super().destroy()
         self["navigationMap"] = None
+        super().destroy()
 
     def _set_active(self, event, skip_activate=True):
         if not base.gui_controller.do_keyboard_navigation:
@@ -247,7 +319,7 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
     def highlight(self):
         """Method to be called when element is the "current_selection"
         (not selected, just the current node for the GuiController) to highlight it."""
-        self._color_scale = self.getColorScale()
+        self._color_scale = p3d.LVecBase4(self.getColorScale())
         self.setColorScale(*base.gui_controller.highlight_color)
 
     def unhighlight(self):
