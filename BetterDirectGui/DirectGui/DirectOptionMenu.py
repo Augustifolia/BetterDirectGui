@@ -42,11 +42,22 @@ class DirectOptionMenu(DirectButton):
             # Changing this breaks button layout
             ('text_align',  TextNode.ALeft, None),
             # Remove press effect because it looks a bit funny
-            ('pressEffect',     0,          DGG.INITOPT),
+            # ('pressEffect',     0,          DGG.INITOPT),
             ('selectable',      True,       None),
             ('downFunc',        True,       None),
             ('upFunc',          True,       None)
            )
+
+        if base.gui_controller.no_initopts:
+            optiondefs += (
+                ('selectedItem', None, self._selected_item),
+                ('pressEffect', 0, self._press_effect),
+            )
+        else:
+            optiondefs += (
+                ('pressEffect', 0, DGG.INITOPT),
+            )
+
         # Merge keyword options with theme from gui_controller
         kw = self.add_theming_options(kw, parent)
 
@@ -103,6 +114,10 @@ class DirectOptionMenu(DirectButton):
         self.initialiseoptions(DirectOptionMenu)
         # Need to call this since we explicitly set frame size
         self.resetFrameSize()
+
+    def _selected_item(self):
+        if self["selectedItem"]:
+            self.set(self["selectedItem"])
 
     def activate(self):
         self.showPopupMenu()
@@ -346,6 +361,9 @@ class DirectOptionMenu(DirectButton):
             if fCommand and self['command']:
                 # Pass any extra args to command
                 self['command'](*[item] + self['extraArgs'])
+
+        if base.gui_controller.no_initopts:
+            self._optionInfo["selectedItem"][DGG._OPT_VALUE] = newIndex
 
         if self["selected"]:
             self["selected"] = False

@@ -102,26 +102,53 @@ class DirectDialog(DirectFrame):
             ('image',             DGG.getDefaultDialogGeom(), None),
             ('relief',            DGG.getDefaultDialogRelief(), None),
             ('borderWidth',       (0.01, 0.01),  None),
-            ('buttonTextList',    [],            DGG.INITOPT),
-            ('buttonGeomList',    [],            DGG.INITOPT),
-            ('buttonImageList',   [],            DGG.INITOPT),
-            ('buttonValueList',   [],            DGG.INITOPT),
-            ('buttonHotKeyList',  [],            DGG.INITOPT),
-            ('button_borderWidth', (.01, .01),   None),
+            # ('buttonTextList',    [],            DGG.INITOPT),
+            # ('buttonGeomList',    [],            DGG.INITOPT),
+            # ('buttonImageList',   [],            DGG.INITOPT),
+            # ('buttonValueList',   [],            DGG.INITOPT),
+            # ('buttonHotKeyList',  [],            DGG.INITOPT),
+            ('button_borderWidth', (.01, .01),   None),  # these should be stored to be able to format new added buttons
             ('button_pad',        (.01, .01),    None),
             ('button_relief',     DGG.RAISED,    None),
             ('button_text_scale', 0.06,          None),
-            ('buttonSize',        None,          DGG.INITOPT),
-            ('topPad',            0.06,          DGG.INITOPT),
-            ('midPad',            0.12,          DGG.INITOPT),
-            ('sidePad',           0.,            DGG.INITOPT),
-            ('buttonPadSF',       1.1,           DGG.INITOPT),
+            # ('buttonSize',        None,          DGG.INITOPT),
+            # ('topPad',            0.06,          DGG.INITOPT),
+            # ('midPad',            0.12,          DGG.INITOPT),
+            # ('sidePad',           0.,            DGG.INITOPT),
+            # ('buttonPadSF',       1.1,           DGG.INITOPT),
             # Alpha of fade screen behind dialog
             ('fadeScreen',        0,             None),
             ('command',           None,          None),
             ('extraArgs',         [],            None),
             ('sortOrder',    DGG.NO_FADE_SORT_INDEX, None),
             ('selectable',        False,         None),
+            )
+
+        if base.gui_controller.no_initopts:
+            optiondefs += (
+                ('buttonTextList', [], self._update_buttons),
+                ('buttonGeomList', [], self._update_buttons),
+                ('buttonImageList', [], self._update_buttons),
+                ('buttonValueList', [], self._update_buttons),
+                ('buttonHotKeyList', [], self._update_hotkeys),
+                ('buttonSize', None, self._update_button_size),
+                ('topPad', 0.06, self._update_pad),
+                ('midPad', 0.12, self._update_pad),
+                ('sidePad', 0., self._update_pad),
+                ('buttonPadSF', 1.1, self._update_pad),
+            )
+        else:
+            optiondefs += (
+                ('buttonTextList', [], DGG.INITOPT),
+                ('buttonGeomList', [], DGG.INITOPT),
+                ('buttonImageList', [], DGG.INITOPT),
+                ('buttonValueList', [], DGG.INITOPT),
+                ('buttonHotKeyList', [], DGG.INITOPT),
+                ('buttonSize', None, DGG.INITOPT),
+                ('topPad', 0.06, DGG.INITOPT),
+                ('midPad', 0.12, DGG.INITOPT),
+                ('sidePad', 0., DGG.INITOPT),
+                ('buttonPadSF', 1.1, DGG.INITOPT),
             )
         # Merge keyword options with theme from gui_controller
         kw = self.add_theming_options(kw, parent)
@@ -190,24 +217,72 @@ class DirectDialog(DirectFrame):
         self.postInitialiseFuncList.append(self.configureDialog)
         self.initialiseoptions(DirectDialog)
 
-    def configureDialog(self):
-        # Set up hot key bindings
-        bindList = zip(self.buttonList, self['buttonHotKeyList'],
-                       self['buttonValueList'])
-        for button, hotKey, value in bindList:
-            if ((type(hotKey) == list) or
-                (type(hotKey) == tuple)):
-                for key in hotKey:
-                    button.bind('press-' + key + '-', self.buttonCommand,
-                                extraArgs = [value])
-                    self.bind('press-' + key + '-', self.buttonCommand,
-                              extraArgs = [value])
-
+    def _update_buttons(self):
+        # Determine number of buttons
+        self.numButtons = max(len(self['buttonTextList']),
+                              len(self['buttonGeomList']),
+                              len(self['buttonImageList']),
+                              len(self['buttonValueList']),
+                              self.numButtons)
+        # Create buttons
+        for i in range(self.numButtons):
+            name = 'Button' + repr(i)
+            try:
+                text = self['buttonTextList'][i]
+            except IndexError:
+                text = None
+            try:
+                geom = self['buttonGeomList'][i]
+            except IndexError:
+                geom = None
+            try:
+                image = self['buttonImageList'][i]
+            except IndexError:
+                image = None
+            try:
+                value = self['buttonValueList'][i]
+            except IndexError:
+                value = i
+                self['buttonValueList'].append(i)
+            if len(self.buttonList) <= i:
+                kw = {}
+                if i != 0:
+                    kw = dict(
+                        borderWidth=self["Button0_borderWidth"],
+                        pad=self["Button0_pad"],
+                        relief=self["Button0_relief"],
+                        text_scale=self["Button0_text_scale"]
+                    )
+                button = self.createcomponent(
+                    name, (), "button",
+                    DirectButton, (self,),
+                    text=text,
+                    geom=geom,
+                    image=image,
+                    suppressKeys=self['suppressKeys'],
+                    frameSize=self['buttonSize'],
+                    command=lambda s=self, v=value: s.buttonCommand(v),
+                    **kw
+                )
+                self.buttonList.append(button)
             else:
-                button.bind('press-' + hotKey + '-', self.buttonCommand,
-                            extraArgs = [value])
-                self.bind('press-' + hotKey + '-', self.buttonCommand,
-                          extraArgs = [value])
+                button = self.buttonList[i]
+                button["text"] = text
+                button["geom"] = geom
+                button["image"] = image
+                button["command"] = lambda s=self, v=value: s.buttonCommand(v)
+
+        self.configureDialog()
+
+    def _update_button_size(self):
+        for button in self.buttonList:
+            button["frameSize"] = self["buttonSize"]
+        self._update_pad()
+
+    def _update_pad(self, set_frameSize=True):
+        if self.fInit:
+            return
+
         # Position buttons and text
         pad = self['pad']
         if self.hascomponent('image0'):
@@ -232,8 +307,8 @@ class DirectDialog(DirectFrame):
             t = bounds[1][2]
         # Center text and geom around origin
         # How far is center of text from origin?
-        xOffset = -(l+r)*0.5
-        zOffset = -(b+t)*0.5
+        xOffset = -(l + r) * 0.5
+        zOffset = -(b + t) * 0.5
         # Update bounds to reflect text movement
         l += xOffset
         r += xOffset
@@ -283,8 +358,8 @@ class DirectDialog(DirectFrame):
             scale = self['button_scale']
             # Can either be a Vec3 or a tuple of 3 values
             if (isinstance(scale, Vec3) or
-                (type(scale) == list) or
-                (type(scale) == tuple)):
+                    (type(scale) == list) or
+                    (type(scale) == tuple)):
                 sx = scale[0]
                 sz = scale[2]
             elif ((type(scale) == int) or
@@ -302,7 +377,7 @@ class DirectDialog(DirectFrame):
             bWidth = br - bl
             # Add pad between buttons
             bSpacing = self['buttonPadSF'] * bWidth
-            bPos = -bSpacing * (self.numButtons - 1)*0.5
+            bPos = -bSpacing * (self.numButtons - 1) * 0.5
             index = 0
             for button in self.buttonList:
                 button.setPos(bPos + index * bSpacing, 0,
@@ -325,12 +400,39 @@ class DirectDialog(DirectFrame):
         # reduce bottom by pad, button height and 2*button pad
         b = min(b - self['midPad'] - bpad[1] - bHeight - bpad[1], b) - pad[1]
         t = t + self['topPad'] + pad[1]
-        if self['frameSize'] is None:
-            self['frameSize'] = (l, r, b, t)
+        if set_frameSize:
+            self["frameSize"] = (l, r, b, t)
+        else:
+            if self['frameSize'] is None:
+                self['frameSize'] = (l, r, b, t)
         self['image_scale'] = (r - l, 1, t - b)
         # Center frame about text and buttons
-        self['image_pos'] = ((l+r)*0.5, 0.0, (b+t)*0.5)
+        self['image_pos'] = ((l + r) * 0.5, 0.0, (b + t) * 0.5)
         self.resetFrameSize()
+
+    def _update_hotkeys(self):
+        bindList = zip(self.buttonList, self['buttonHotKeyList'],
+                       self['buttonValueList'])
+        for button, hotKey, value in bindList:
+            if ((type(hotKey) == list) or
+                    (type(hotKey) == tuple)):
+                for key in hotKey:
+                    button.bind('press-' + key + '-', self.buttonCommand,
+                                extraArgs=[value])
+                    self.bind('press-' + key + '-', self.buttonCommand,
+                              extraArgs=[value])
+
+            else:
+                button.bind('press-' + hotKey + '-', self.buttonCommand,
+                            extraArgs=[value])
+                self.bind('press-' + hotKey + '-', self.buttonCommand,
+                          extraArgs=[value])
+
+    def configureDialog(self):
+        # Set up hot key bindings
+        self._update_hotkeys()
+
+        self._update_pad(set_frameSize=False)
 
     def show(self):
         if self['fadeScreen']:
@@ -370,8 +472,8 @@ class OkDialog(DirectDialog):
         # Inherits from DirectFrame
         optiondefs = (
             # Define type of DirectGuiWidget
-            ('buttonTextList',  ['OK'],       DGG.INITOPT),
-            ('buttonValueList', [DGG.DIALOG_OK],          DGG.INITOPT),
+            ('buttonTextList',  ['OK'],       None),
+            ('buttonValueList', [DGG.DIALOG_OK],          None),
             )
         # Merge keyword options with default options
         self.defineoptions(kw, optiondefs)
@@ -383,8 +485,8 @@ class OkCancelDialog(DirectDialog):
         # Inherits from DirectFrame
         optiondefs = (
             # Define type of DirectGuiWidget
-            ('buttonTextList',  ['OK','Cancel'],       DGG.INITOPT),
-            ('buttonValueList', [DGG.DIALOG_OK, DGG.DIALOG_CANCEL], DGG.INITOPT),
+            ('buttonTextList',  ['OK','Cancel'],       None),
+            ('buttonValueList', [DGG.DIALOG_OK, DGG.DIALOG_CANCEL], None),
             )
         # Merge keyword options with default options
         self.defineoptions(kw, optiondefs)
@@ -396,8 +498,8 @@ class YesNoDialog(DirectDialog):
         # Inherits from DirectFrame
         optiondefs = (
             # Define type of DirectGuiWidget
-            ('buttonTextList',  ['Yes', 'No'],       DGG.INITOPT),
-            ('buttonValueList', [DGG.DIALOG_YES, DGG.DIALOG_NO], DGG.INITOPT),
+            ('buttonTextList',  ['Yes', 'No'],       None),
+            ('buttonValueList', [DGG.DIALOG_YES, DGG.DIALOG_NO], None),
             )
         # Merge keyword options with default options
         self.defineoptions(kw, optiondefs)
@@ -409,9 +511,8 @@ class YesNoCancelDialog(DirectDialog):
         # Inherits from DirectFrame
         optiondefs = (
             # Define type of DirectGuiWidget
-            ('buttonTextList',  ['Yes', 'No', 'Cancel'],  DGG.INITOPT),
-            ('buttonValueList', [DGG.DIALOG_YES, DGG.DIALOG_NO, DGG.DIALOG_CANCEL],
-             DGG.INITOPT),
+            ('buttonTextList',  ['Yes', 'No', 'Cancel'],  None),
+            ('buttonValueList', [DGG.DIALOG_YES, DGG.DIALOG_NO, DGG.DIALOG_CANCEL],  None),
             )
         # Merge keyword options with default options
         self.defineoptions(kw, optiondefs)
@@ -423,8 +524,8 @@ class RetryCancelDialog(DirectDialog):
         # Inherits from DirectFrame
         optiondefs = (
             # Define type of DirectGuiWidget
-            ('buttonTextList',  ['Retry','Cancel'],   DGG.INITOPT),
-            ('buttonValueList', [DGG.DIALOG_RETRY, DGG.DIALOG_CANCEL], DGG.INITOPT),
+            ('buttonTextList',  ['Retry','Cancel'],   None),
+            ('buttonValueList', [DGG.DIALOG_RETRY, DGG.DIALOG_CANCEL], None),
             )
         # Merge keyword options with default options
         self.defineoptions(kw, optiondefs)

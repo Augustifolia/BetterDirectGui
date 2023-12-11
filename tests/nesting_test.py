@@ -6,9 +6,15 @@ def test():
 
 
 def test_setup1():
-    b1 = DirectButton(text="button1", command=test)
-    b1.setScale(0.2)
-    b1.setPos(-0.7, 0, 0)
+    b1 = DirectButton(text="button1", command=test, suppressMouse=0, frameTexture="models/maps/circle.png")
+    # b1.setScale(0.2)
+    # b1.setPos(-0.7, 0, 0)
+    b1["scale"] = 0.2
+    b1["pos"] = (-0.7, 0, 0)
+    b1["hpr"] = (30, 30, 30)
+    b1["suppressMouse"] = 1
+    b1["suppressKeys"] = 1
+    b1["transparency"] = 1
 
     f0 = DirectFrame(frameSize=(-1, 1, -1, 1))
     f0.setScale(0.2)

@@ -2,6 +2,7 @@
 from __future__ import annotations
 import direct.gui.DirectGuiBase as DirectGuiBase
 import direct.gui.DirectGuiGlobals as DGG
+import panda3d.core as p3d
 
 from typing import Any
 
@@ -37,6 +38,20 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
             ('selected',       False,         self.set_selected),
             ('navigationMap',  navigationMap, None)
         )
+
+        if base.gui_controller.no_initopts:
+            optiondefs += (
+                ('pos', None, self._set_pos),
+                ('hpr', None, self._set_hpr),
+                ('scale', None, self._set_scale),
+                ('color', None, self._set_color),
+                ('transparency', None, self._set_transparency),
+                # Do events pass through this widget?
+                ('suppressMouse', 1, self._suppress_mouse_and_keys),
+                ('suppressKeys', 0, self._suppress_mouse_and_keys),
+                ('enableEdit', 1, self._enable_edit),
+            )
+
         if not hasattr(self, "_kw"):
             self._kw = {}
         if not hasattr(self, "_theme"):
@@ -56,6 +71,43 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
         self.initialiseoptions(DirectGuiWidget)
 
         self.bind(DGG.B1PRESS, self._set_active)
+
+    def _set_pos(self):
+        if self['pos']:
+            self.setPos(self['pos'])
+
+    def _set_hpr(self):
+        if self['hpr']:
+            self.setHpr(self['hpr'])
+
+    def _set_scale(self):
+        if self['scale']:
+            self.setScale(self['scale'])
+
+    def _set_color(self):
+        if self['color']:
+            self.setColor(self['color'])
+
+    def _set_transparency(self):
+        if self["transparency"] is not None:
+            self.setTransparency(self["transparency"])
+
+    def _enable_edit(self):
+        # Is drag and drop enabled?
+        if self['enableEdit'] and self.guiEdit:
+            self.enableEdit()
+        else:
+            self.disableEdit()
+
+    def _suppress_mouse_and_keys(self):
+        # Set up event handling
+        suppressFlags = 0
+        if self['suppressMouse']:
+            suppressFlags |= p3d.MouseWatcherRegion.SFMouseButton
+            suppressFlags |= p3d.MouseWatcherRegion.SFMousePosition
+        if self['suppressKeys']:
+            suppressFlags |= p3d.MouseWatcherRegion.SFOtherButton
+        self.guiItem.setSuppressFlags(suppressFlags)
 
     def set_theme(self, theme: dict, priority=0):
         """Set theme of this element and its children to the specified theme.
@@ -247,7 +299,7 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
     def highlight(self):
         """Method to be called when element is the "current_selection"
         (not selected, just the current node for the GuiController) to highlight it."""
-        self._color_scale = self.getColorScale()
+        self._color_scale = p3d.LVecBase4(self.getColorScale())
         self.setColorScale(*base.gui_controller.highlight_color)
 
     def unhighlight(self):

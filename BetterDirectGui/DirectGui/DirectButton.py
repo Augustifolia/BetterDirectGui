@@ -45,9 +45,18 @@ class DirectButton(DirectFrame):
             ('clickSound',    DGG.getDefaultClickSound(),    self.setClickSound),
             # Can only be specified at time of widget contruction
             # Do the text/graphics appear to move when the button is clicked
-            ('pressEffect',     1,         DGG.INITOPT),
+            # ('pressEffect',     1,         DGG.INITOPT),
             ('selectable',      True,      None),
         )
+
+        if base.gui_controller.no_initopts:
+            optiondefs += (
+                ('pressEffect', 1, self._press_effect),
+            )
+        else:
+            optiondefs += (
+                ('pressEffect', 1, DGG.INITOPT),
+            )
 
         # Merge keyword options with theme from gui_controller
         kw = self.add_theming_options(kw, parent)
@@ -82,6 +91,33 @@ class DirectButton(DirectFrame):
                   Mat4.scaleMat(0.98) * \
                   Mat4.translateMat(centerX, 0, centerY)
             pressEffectNP.setMat(mat)
+
+    def _press_effect(self):
+        if self["pressEffect"]:
+            if not self.stateNodePath[1].get_name() == "pressEffect":
+                children = self.stateNodePath[1].getChildren()
+                pressEffectNP = self.stateNodePath[1].attachNewNode('pressEffect', 1)
+                self.stateNodePath[1] = pressEffectNP
+                for child in children:
+                    child.reparentTo(pressEffectNP)
+            else:
+                pressEffectNP = self.stateNodePath[1]
+
+            # Now apply the scale.
+            if pressEffectNP:
+                bounds = self.getBounds()
+                centerX = (bounds[0] + bounds[1]) / 2
+                centerY = (bounds[2] + bounds[3]) / 2
+
+                # Make a matrix that scales about the point
+                mat = Mat4.translateMat(-centerX, 0, -centerY) * \
+                      Mat4.scaleMat(0.98) * \
+                      Mat4.translateMat(centerX, 0, centerY)
+                pressEffectNP.setMat(mat)
+        else:
+            if self.stateNodePath[1].get_name() == "pressEffect":
+                pressEffectNP = self.stateNodePath[1]
+                pressEffectNP.setMat(Mat4.identMat())
 
     def click(self):
         self.commandFunc("")

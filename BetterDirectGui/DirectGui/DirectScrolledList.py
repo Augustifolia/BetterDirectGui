@@ -86,8 +86,8 @@ class DirectScrolledList(DirectFrame):
         optiondefs = (
             # Define type of DirectGuiWidget
             ('items',              [],        None),
-            ('itemsAlign',  TextNode.ACenter, DGG.INITOPT),
-            ('itemsWordwrap',      None,      DGG.INITOPT),
+            # ('itemsAlign',  TextNode.ACenter, DGG.INITOPT),
+            # ('itemsWordwrap',      None,      DGG.INITOPT),
             ('command',            None,      None),
             ('extraArgs',          [],        None),
             ('itemMakeFunction',   None,      None),
@@ -98,6 +98,18 @@ class DirectScrolledList(DirectFrame):
             ('incButtonCallback',  None,      self.setIncButtonCallback),
             ('decButtonCallback',  None,      self.setDecButtonCallback),
             )
+
+        if base.gui_controller.no_initopts:
+            optiondefs += (
+                ('itemsAlign', TextNode.ACenter, self._items_align),
+                ('itemsWordwrap', None, self._items_wordwrap),
+            )
+        else:
+            optiondefs += (
+                ('itemsAlign', TextNode.ACenter, DGG.INITOPT),
+                ('itemsWordwrap', None, DGG.INITOPT),
+            )
+
         # Merge keyword options with theme from gui_controller
         kw = self.add_theming_options(kw, parent)
 
@@ -135,6 +147,26 @@ class DirectScrolledList(DirectFrame):
         self.initialiseoptions(DirectScrolledList)
         self.recordMaxHeight()
         self.scrollTo(0)
+
+    def _items_align(self):
+        if not self["itemsAlign"]:
+            return
+
+        for item in self["items"]:
+            if isinstance(item, str):
+                continue
+
+            item["text_align"] = self["itemsAlign"]
+
+    def _items_wordwrap(self):
+        if not self["itemsWordwrap"]:
+            return
+
+        for item in self["items"]:
+            if isinstance(item, str):
+                continue
+
+            item["text_wordwrap"] = self["itemsWordwrap"]
 
     def _inc_button_activate(self):
         self.scrollBy(1)

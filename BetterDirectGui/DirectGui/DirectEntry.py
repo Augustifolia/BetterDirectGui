@@ -52,7 +52,7 @@ class DirectEntry(DirectFrame):
             ('pgFunc',          PGEntry,          None),
             ('numStates',       3,                None),
             ('state',           DGG.NORMAL,       None),
-            ('entryFont',       None,             DGG.INITOPT),
+            # ('entryFont',       None,             DGG.INITOPT),
             ('width',           10,               self.updateWidth),
             ('numLines',        1,                self.updateNumLines),
             ('focus',           0,                self.setFocus),
@@ -86,6 +86,16 @@ class DirectEntry(DirectFrame):
             ('autoCapitalizeForcePrefixes', DirectEntry.ForceCapNamePrefixes, None),
             ('selectable',      True,             None),
         )
+        if base.gui_controller.no_initopts:
+            optiondefs += (
+                ('enteredText', None, self._enteredText),
+                ('entryFont', None, self._entry_font),
+            )
+        else:
+            optiondefs += (
+                ('entryFont', None, DGG.INITOPT),
+            )
+
         # Merge keyword options with theme from gui_controller
         kw = self.add_theming_options(kw, parent)
 
@@ -150,6 +160,17 @@ class DirectEntry(DirectFrame):
         self.unicodeText = 0
         if self['initialText']:
             self.enterText(self['initialText'])
+
+    def _enteredText(self):
+        if self["enteredText"]:
+            self.enterText(self["enteredText"])
+
+    def _entry_font(self):
+        if not self['entryFont']:
+            font = DGG.getDefaultFont()
+        else:
+            font = self['entryFont']
+        self.onscreenText["font"] = font
 
     def click(self):
         self["focus"] = 1
@@ -300,6 +321,9 @@ class DirectEntry(DirectFrame):
                 self.guiItem.setWtext(text)
             else:
                 self.guiItem.setText(text)
+
+        if base.gui_controller.no_initopts:
+            self._optionInfo["enteredText"][DGG._OPT_VALUE] = text
 
     def get(self, plain = False):
         """ Returns the text currently showing in the typable region.

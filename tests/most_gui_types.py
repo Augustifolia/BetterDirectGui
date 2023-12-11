@@ -29,6 +29,8 @@ class GUI:
             command=test
         )
         self.pg196.setTransparency(0)
+        self.pg196["pressEffect"] = 1
+        self.pg196["pressEffect"] = 0
 
         self.pg1363 = DirectEntry(
             pos = LPoint3f(-0.85, 0, 0.65),
@@ -39,7 +41,13 @@ class GUI:
 
         self.pg2152 = DirectEntry(
             # parent=self.pg2153,
+            initialText="hello"
         )
+        print(self.pg2152["enteredText"])
+        self.pg2152["enteredText"] = "some string"
+        print(self.pg2152["enteredText"])
+        self.pg2152.set("other")
+        print(self.pg2152["enteredText"])
         self.pg2152.setTransparency(0)
         self.pg2153 = DirectEntryScroll(
             parent=rootParent,
@@ -57,6 +65,7 @@ class GUI:
             checkedImage="models/maps/envir-bamboo.png"
         )
         self.pg2627.setTransparency(0)
+        self.pg2627["pressEffect"] = 1
 
         self.pg3182 = DirectCheckButton(
             pos = LPoint3f(-0.9, 0, 0.5),
@@ -65,6 +74,7 @@ class GUI:
             parent=rootParent
         )
         self.pg3182.setTransparency(0)
+        self.pg3182["pressEffect"] = 1
 
         self.pg5339 = DirectOptionMenu(
             pos = LPoint3f(-0.525, 0, 0.5),
@@ -75,6 +85,9 @@ class GUI:
             items=["button1", "button2", "button3"]
         )
         self.pg5339.setTransparency(0)
+        self.pg5339["selectedItem"] = "button2"
+        print(self.pg5339["selectedItem"])
+        self.pg5339["pressEffect"] = 1
 
         self.pg8076 = DirectRadioButton(
             pos = LPoint3f(0.225, 0, 0.475),
@@ -185,15 +198,24 @@ class GUI:
         self.pg16851.addItem(l4)
         self.pg16851.addItem(l5)
         self.pg16851.addItem(l6)
+        self.pg16851["itemsWordwrap"] = 4
+        self.pg16851["itemsAlign"] = TextNode.ARight
 
         self.pg18888 = OkDialog(
             state = 'normal',
             pos = LPoint3f(0.9, 0.1, 0.675),
             text = 'Ok Dialog',
             parent=rootParent,
+            buttonTextList=["b1"],
+            buttonSize=(-.1, .1, -.1, .1)
         )
         self.pg18888.setTransparency(0)
-
+        self.pg18888["topPad"] = 0.4
+        self.pg18888["sidePad"] = 0.1
+        self.pg18888["midPad"] = 0.1
+        self.pg18888["buttonPadSF"] = 1.1
+        self.pg18888["buttonSize"] = (-.1, .1, -.1, .1)
+        self.pg18888["buttonTextList"] = ["b1", "b2", "b3"]
 
     def show(self):
         self.pg196.show()

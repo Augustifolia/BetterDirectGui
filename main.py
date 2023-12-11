@@ -28,11 +28,12 @@ def test_inverted_scrollbar():
 
 if __name__ == '__main__':
     base = ShowBase()  # init ShowBase
-    BetterDirectGui.init(respect_sortOrder=False, do_bug_fixes=True, do_keyboard_navigation=True)  # init BetterDirectGui after ShowBase
+    base.accept("escape", base.userExit)
+    BetterDirectGui.init(respect_sortOrder=False, do_bug_fixes=True, do_keyboard_navigation=True, no_initopts=True)  # init BetterDirectGui after ShowBase
     # base.gui_controller.update_key_map()
 
     # create some gui
-    run_test = 1
+    run_test = 0
 
     if run_test == 0:
         test_most_types()

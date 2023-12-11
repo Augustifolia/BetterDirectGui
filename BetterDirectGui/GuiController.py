@@ -24,6 +24,7 @@ class GuiController(DirectObject):
     :param do_bug_fixes: Changes some buggy behaviour in DirectGui.
     :param theme: The global theme used by all elements that are children of base_np.
     :param do_keyboard_navigation: Chose weather keyboard navigation is enabled.
+    :param no_initopts: Bool for making all initopts editable after gui creation.
     """
 
     # An example theme (useful for testing)
@@ -46,13 +47,14 @@ class GuiController(DirectObject):
     gui_theme_priority = -1
 
     def __init__(self, base_np: p3d.NodePath = None, respect_sortOrder=True,
-                 do_bug_fixes=False, theme=None, do_keyboard_navigation=True):
+                 do_bug_fixes=False, theme=None, do_keyboard_navigation=True, no_initopts=False):
         super().__init__()
         base.gui_controller = self
         self._respect_sortOrder = respect_sortOrder
         self._guiItems = DirectGuiBase.DirectGuiWidget.guiDict
         self._do_bug_fixes = do_bug_fixes
         self._do_theming = True
+        self._no_initopts = no_initopts
         if theme is not None:
             self.set_theme(theme)
 
@@ -129,6 +131,11 @@ class GuiController(DirectObject):
     def do_keyboard_navigation(self):
         """Bool for if keyboard navigation is enabled."""
         return self._do_keyboard_navigation
+
+    @property
+    def no_initopts(self):
+        """Bool for making all initopts editable after gui creation."""
+        return self._no_initopts
 
     def get_opposite_direction(self, direction: str) -> str:
         """Get the opposite direction to the direction specified.
