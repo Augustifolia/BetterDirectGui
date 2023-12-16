@@ -33,11 +33,25 @@ class DirectCheckBox(DirectButton):
             # Can only be specified at time of widget contruction
             # Do the text/graphics appear to move when the button is clicked
             # ('pressEffect',     1,         DGG.INITOPT),
-            ('uncheckedImage',  None,      None),
-            ('checkedImage',    None,      None),
-            ('isChecked',       False,     None),
+            # ('uncheckedImage',  None,      None),
+            # ('checkedImage',    None,      None),
+            # ('isChecked',       False,     None),
             ('selectable',      True,      None),
         )
+
+        if base.gui_controller.no_initopts:
+            optiondefs += (
+                ('uncheckedImage', None, self._update_image),
+                ('checkedImage', None, self._update_image),
+                ('isChecked', False, self._update_image),
+            )
+        else:
+            optiondefs += (
+                ('uncheckedImage', None, None),
+                ('checkedImage', None, None),
+                ('isChecked', False, None),
+            )
+
         # Merge keyword options with theme from gui_controller
         kw = self.add_theming_options(kw, parent)
 
@@ -49,14 +63,17 @@ class DirectCheckBox(DirectButton):
         self.initialiseoptions(DirectCheckBox)
 
         if base.gui_controller._do_bug_fixes:
-            if self['isChecked']:
-                self['image'] = self['checkedImage']
-            else:
-                self['image'] = self['uncheckedImage']
-
-            self.setImage()
+            self._update_image()
             if self["frameSize"] is None:
                 self.resetFrameSize()
+
+    def _update_image(self):
+        if self['isChecked']:
+            self['image'] = self['checkedImage']
+        else:
+            self['image'] = self['uncheckedImage']
+
+        self.setImage()
 
     def click(self):
         self.commandFunc("")
@@ -71,12 +88,7 @@ class DirectCheckBox(DirectButton):
     def commandFunc(self, event):
         self['isChecked'] = not self['isChecked']
 
-        if self['isChecked']:
-            self['image'] = self['checkedImage']
-        else:
-            self['image'] = self['uncheckedImage']
-
-        self.setImage()
+        self._update_image()
 
         if self['command']:
             # Pass any extra args to command

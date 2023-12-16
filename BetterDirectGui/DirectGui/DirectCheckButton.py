@@ -36,15 +36,36 @@ class DirectCheckButton(DirectButton):
         optiondefs = (
             ('indicatorValue', 0, self.setIndicatorValue),
             # boxBorder defines the space created around the check box
-            ('boxBorder', 0, None),
+            # ('boxBorder', 0, None),
             # boxPlacement maps left, above, right, below
-            ('boxPlacement', 'left', None),
-            ('boxImage', None, None),
-            ('boxImageScale', 1, None),
-            ('boxImageColor', None, None),
-            ('boxRelief', 'sunken', None),
+            # ('boxPlacement', 'left', None),
+            # ('boxImage', None, None),
+            # ('boxImageScale', 1, None),
+            # ('boxImageColor', None, None),
+            # ('boxRelief', 'sunken', None),
             ('selectable', True, None),
         )
+        if base.gui_controller.no_initopts:
+            optiondefs += (
+                ('boxBorder', 0, self.setFrameSize),
+                # boxPlacement maps left, above, right, below
+                ('boxPlacement', 'left', self._update_box_placement),
+                ('boxImage', None, self._update_box_image),
+                ('boxImageScale', 1, self._update_box_image),
+                ('boxImageColor', None, self._update_image_color),
+                ('boxRelief', 'sunken', self._update_box_relief),
+            )
+        else:
+            optiondefs += (
+                ('boxBorder', 0, None),
+                # boxPlacement maps left, above, right, below
+                ('boxPlacement', 'left', None),
+                ('boxImage', None, None),
+                ('boxImageScale', 1, None),
+                ('boxImageColor', None, None),
+                ('boxRelief', 'sunken', None),
+            )
+
         # Merge keyword options with theme from gui_controller
         kw = self.add_theming_options(kw, parent)
 
@@ -68,9 +89,50 @@ class DirectCheckButton(DirectButton):
         # After initialization with X giving it the correct size, put back space
         if self['boxImage'] ==  None:
             self.indicator['text'] = (' ', '*')
-            self.indicator['text_pos'] = (0, -.2)
+            if not base.gui_controller.no_initopts:
+                self.indicator['text_pos'] = (0, -.2)
+            # self.indicator.component("text0").set_pos(0, 0, .2)
         else:
             self.indicator['text'] = (' ', ' ')
+        if self['boxImageColor'] != None and self['boxImage'] !=  None:
+            self.colors = [VBase4(0, 0, 0, 0), self['boxImageColor']]
+            self.component('indicator')['image_color'] = VBase4(0, 0, 0, 0)
+
+    def _update_box_relief(self):
+        self.indicator["relief"] = self["boxRelief"]
+
+    def _update_box_placement(self):
+        self.setFrameSize()
+
+    def _update_box_image(self):
+        skip = False
+        if self.indicator["image"] is None and self["boxImage"] is None:
+            skip = True
+        self.indicator["image"] = self["boxImage"]
+        if self["boxImageScale"] is not None:
+            self.indicator["image_scale"] = self["boxImageScale"]
+        if self["boxImageColor"] is not None:
+            self.indicator["image_color"] = self["boxImageColor"]
+
+        if self['boxImage'] ==  None:
+            self.indicator['text'] = ('X', 'X')
+            self.indicator.resetFrameSize()
+            self.indicator['text'] = (' ', '*')
+            self.indicator.component("text0").set_pos(0, 0, .2)  # for some reason this was required to line it up
+            # self.indicator['text_pos'] = (0, -.2)
+        else:
+            self.indicator['text'] = (' ', ' ')
+            self.indicator.resetFrameSize()
+        if self['boxImageColor'] != None and self['boxImage'] !=  None:
+            self.colors = [VBase4(0, 0, 0, 0), self['boxImageColor']]
+            self.component('indicator')['image_color'] = VBase4(0, 0, 0, 0)
+        if not skip:
+            self.setFrameSize()
+
+    def _update_image_color(self):
+        if self["boxImageColor"] is not None:
+            self.indicator["image_color"] = self["boxImageColor"]
+
         if self['boxImageColor'] != None and self['boxImage'] !=  None:
             self.colors = [VBase4(0, 0, 0, 0), self['boxImageColor']]
             self.component('indicator')['image_color'] = VBase4(0, 0, 0, 0)

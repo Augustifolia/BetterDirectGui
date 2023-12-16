@@ -43,19 +43,47 @@ class DirectRadioButton(DirectButton):
             # others is a list of other radio buttons sharing same variable
             ('others', [], None),
             # boxBorder defines the space created around the check box
-            ('boxBorder', 0, None),
+            # ('boxBorder', 0, None),
             # boxPlacement maps left, above, right, below
-            ('boxPlacement', 'left', None),
+            # ('boxPlacement', 'left', None),
             # boxGeom defines geom to indicate current radio button is selected or not
-            ('boxGeom', None, None),
-            ('boxGeomColor', None, None),
-            ('boxGeomScale', 1.0, None),
-            ('boxImage', None, None),
-            ('boxImageScale', 1.0, None),
-            ('boxImageColor', VBase4(1, 1, 1, 1), None),
-            ('boxRelief', None, None),
+            # ('boxGeom', None, None),
+            # ('boxGeomColor', None, None),
+            # ('boxGeomScale', 1.0, None),
+            # ('boxImage', None, None),
+            # ('boxImageScale', 1.0, None),
+            # ('boxImageColor', VBase4(1, 1, 1, 1), None),
+            # ('boxRelief', None, None),
             ('selectable', True, None),
         )
+
+        if base.gui_controller.no_initopts:
+            optiondefs += (
+                ('boxBorder', 0, self.setFrameSize),
+                # boxPlacement maps left, above, right, below
+                ('boxPlacement', 'left', self.setFrameSize),
+                ('boxGeom', None, self._update_box_geom_image),
+                ('boxGeomColor', None, self._update_box_geom_image),
+                ('boxGeomScale', 1.0, self._update_box_geom_image),
+                ('boxImage', None, self._update_box_geom_image),
+                ('boxImageScale', 1.0, self._update_box_geom_image),
+                ('boxImageColor', VBase4(1, 1, 1, 1), self._update_box_geom_image),
+                ('boxRelief', None, self._update_box_geom_image),
+            )
+        else:
+            optiondefs += (
+                ('boxBorder', 0, None),
+                # boxPlacement maps left, above, right, below
+                ('boxPlacement', 'left', None),
+                ('boxGeom', None, None),
+                ('boxGeomColor', None, None),
+                ('boxGeomScale', 1.0, None),
+                ('boxImage', None, None),
+                ('boxImageScale', 1.0, None),
+                ('boxImageColor', VBase4(1, 1, 1, 1), None),
+                ('boxRelief', None, None),
+            )
+
         # Merge keyword options with theme from gui_controller
         kw = self.add_theming_options(kw, parent)
 
@@ -84,7 +112,9 @@ class DirectRadioButton(DirectButton):
             if not 'boxRelief' in kw and self['boxImage'] is None:
                 self.indicator['relief'] = DGG.SUNKEN
             self.indicator['text'] = (' ', '*')
-            self.indicator['text_pos'] = (0, -.25)
+            if not base.gui_controller.no_initopts:
+                self.indicator['text_pos'] = (0, -.25)
+            # self.indicator.component("text0").set_pos(0, 0, .25)
         else:
             self.indicator['text'] = (' ', ' ')
 
@@ -101,6 +131,46 @@ class DirectRadioButton(DirectButton):
 
         if needToCheck:
             self.check()
+
+    def _update_box_geom_image(self):
+        skip = False
+        if (self.indicator["geom"] is None and self["boxGeom"] is None and
+                self.indicator["image"] is None and self["boxImage"] is None):
+            skip = True
+
+        self.indicator["geom"] = self["boxGeom"]
+        if self["boxGeomColor"] is not None:
+            self.indicator["geom_color"] = self["boxGeomColor"]
+        if self["boxGeomScale"] is not None:
+            self.indicator["geom_scale"] = self["boxGeomScale"]
+
+        self.indicator["image"] = self["boxImage"]
+        if self["boxImageColor"] is not None:
+            self.indicator["image_color"] = self["boxImageColor"]
+        if self["boxImageScale"] is not None:
+            self.indicator["image_scale"] = self["boxImageScale"]
+
+        self.indicator["relief"] = self["boxRelief"]
+
+        if self['boxGeom'] is None:
+            if self["boxImage"] is None and self['boxRelief'] is None:
+                self.indicator['relief'] = DGG.SUNKEN
+            self.indicator['text'] = ('X', 'X')
+            self.indicator.setFrameSize()
+            self.indicator['text'] = (' ', '*')
+            # self.indicator['text_pos'] = (0, -.25)
+            self.indicator.component("text0").set_pos(0, 0, .25)
+
+        else:
+            self.indicator['text'] = (' ', ' ')
+            self.indicator.setFrameSize()
+
+        if not skip:
+            self.setFrameSize()
+
+        if self['boxGeomColor'] != None and self['boxGeom'] != None:
+            self.colors = [VBase4(1, 1, 1, 0), self['boxGeomColor']]
+            self.component('indicator')['geom_color'] = VBase4(1, 1, 1, 0)
 
     def click(self):
         self.commandFunc("")

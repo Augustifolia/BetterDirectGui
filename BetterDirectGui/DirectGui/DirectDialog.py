@@ -117,7 +117,7 @@ class DirectDialog(DirectFrame):
             # ('sidePad',           0.,            DGG.INITOPT),
             # ('buttonPadSF',       1.1,           DGG.INITOPT),
             # Alpha of fade screen behind dialog
-            ('fadeScreen',        0,             None),
+            # ('fadeScreen',        0,             None),
             ('command',           None,          None),
             ('extraArgs',         [],            None),
             ('sortOrder',    DGG.NO_FADE_SORT_INDEX, None),
@@ -136,6 +136,7 @@ class DirectDialog(DirectFrame):
                 ('midPad', 0.12, self._update_pad),
                 ('sidePad', 0., self._update_pad),
                 ('buttonPadSF', 1.1, self._update_pad),
+                ('fadeScreen', 0, self._update_fade_screen),
             )
         else:
             optiondefs += (
@@ -149,6 +150,7 @@ class DirectDialog(DirectFrame):
                 ('midPad', 0.12, DGG.INITOPT),
                 ('sidePad', 0., DGG.INITOPT),
                 ('buttonPadSF', 1.1, DGG.INITOPT),
+                ('fadeScreen', 0, None),
             )
         # Merge keyword options with theme from gui_controller
         kw = self.add_theming_options(kw, parent)
@@ -216,6 +218,14 @@ class DirectDialog(DirectFrame):
         # Update dialog when everything has been initialised
         self.postInitialiseFuncList.append(self.configureDialog)
         self.initialiseoptions(DirectDialog)
+
+    def _update_fade_screen(self):
+        if self['fadeScreen']:
+            base.transitions.fadeScreen(self['fadeScreen'])
+            self.setBin('gui-popup', 0)
+
+        else:
+            base.transitions.noTransitions()
 
     def _update_buttons(self):
         # Determine number of buttons

@@ -62,22 +62,36 @@ class GUI:
             scale = LVecBase3f(0.1, 0.1, 0.1),
             parent=rootParent,
             uncheckedImage="models/maps/circle.png",
-            checkedImage="models/maps/envir-bamboo.png"
+            checkedImage="models/maps/envir-bamboo.png",
+            # isChecked=True
         )
+        self.pg2627["uncheckedImage"] = "models/maps/envir-bamboo.png"
+        self.pg2627["checkedImage"] = "models/maps/circle.png"
         self.pg2627.setTransparency(0)
         self.pg2627["pressEffect"] = 1
+        self.pg2627["isChecked"] = True
 
         self.pg3182 = DirectCheckButton(
             pos = LPoint3f(-0.9, 0, 0.5),
             scale = LVecBase3f(0.1, 0.1, 0.1),
             text = 'Checkbutton',
-            parent=rootParent
+            parent=rootParent,
+            # boxImage="models/maps/circle.png",
+            # boxImageColor=(.1, 1, 1, 1)
+            # boxPlacement="right"
         )
-        self.pg3182.setTransparency(0)
-        self.pg3182["pressEffect"] = 1
+        # self.pg3182["boxBorder"] = 0.1
+        # self.pg3182["boxPlacement"] = "right"
+        # self.pg3182["boxImageScale"] = 0.5
+        # self.pg3182["boxImageColor"] = (1, .1, 1, 1)
+        # self.pg3182["boxPlacement"] = "left"
+        # self.pg3182["boxRelief"] = "flat"
+        # self.pg3182["boxImage"] = None
+        # self.pg3182["boxImage"] = "models/maps/circle.png"
+        # self.pg3182.setFrameSize()
 
         self.pg5339 = DirectOptionMenu(
-            pos = LPoint3f(-0.525, 0, 0.5),
+            pos = LPoint3f(-0.725, 0, 0.5),
             scale = LVecBase3f(0.1, 0.1, 0.1),
             popupMarker_pos = None,
             text_align = 0,
@@ -88,6 +102,8 @@ class GUI:
         self.pg5339["selectedItem"] = "button2"
         print(self.pg5339["selectedItem"])
         self.pg5339["pressEffect"] = 1
+        self.pg5339["highlightColor"] = (1, 0.2, 0.2, 1)
+        self.pg5339["popupMarkerBorder"] = (.1, .1)
 
         self.pg8076 = DirectRadioButton(
             pos = LPoint3f(0.225, 0, 0.475),
@@ -97,8 +113,14 @@ class GUI:
             parent=rootParent,
             variable=[],
             value=[],
+            # boxImage="models/maps/circle.png"
         )
         self.pg8076.setTransparency(0)
+        # self.pg8076["boxBorder"] = .3
+        # self.pg8076["boxPlacement"] = "right"
+        # self.pg8076["boxImage"] = None
+        # self.pg8076["boxRelief"] = "flat"
+        # self.pg8076["boxImage"] = "models/maps/circle.png"
 
         self.pg9880 = DirectSlider(
             pos = LPoint3f(-0.05, 0, 0.25),
@@ -207,7 +229,8 @@ class GUI:
             text = 'Ok Dialog',
             parent=rootParent,
             buttonTextList=["b1"],
-            buttonSize=(-.1, .1, -.1, .1)
+            buttonSize=(-.1, .1, -.1, .1),
+            # fadeScreen=0.5,
         )
         self.pg18888.setTransparency(0)
         self.pg18888["topPad"] = 0.4
@@ -216,6 +239,8 @@ class GUI:
         self.pg18888["buttonPadSF"] = 1.1
         self.pg18888["buttonSize"] = (-.1, .1, -.1, .1)
         self.pg18888["buttonTextList"] = ["b1", "b2", "b3"]
+        self.pg18888["fadeScreen"] = 0.4
+        self.pg18888["fadeScreen"] = 0
 
     def show(self):
         self.pg196.show()

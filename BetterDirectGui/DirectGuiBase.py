@@ -206,7 +206,7 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
 
     def destroy(self):
         super().destroy()
-        self["navigationMap"] = None
+        # self["navigationMap"] = None
 
     def _set_active(self, event, skip_activate=True):
         if not base.gui_controller.do_keyboard_navigation:
@@ -271,7 +271,7 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
     def show_click(self):
         """Show that the element is selected by changing its scale."""
         self._scale = self.get_scale()
-        self.set_scale(self._scale * 0.95)
+        self.set_scale(self._scale * 0.98)
 
     def unclick(self):
         """Do stuff that would normally happen when user clicks away from element.

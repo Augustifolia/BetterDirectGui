@@ -31,7 +31,7 @@ class DirectOptionMenu(DirectButton):
             # Can be an integer index or the same string as the button
             ('initialitem', None,           DGG.INITOPT),
             # Amount of padding to place around popup button indicator
-            ('popupMarkerBorder', (.1, .1), None),
+            # ('popupMarkerBorder', (.1, .1), None),
             # The initial position of the popup marker
             ('popupMarker_pos', None, None),
             # Background color to use to highlight popup menu items
@@ -52,10 +52,12 @@ class DirectOptionMenu(DirectButton):
             optiondefs += (
                 ('selectedItem', None, self._selected_item),
                 ('pressEffect', 0, self._press_effect),
+                ('popupMarkerBorder', (.1, .1), self._update_marker_border),
             )
         else:
             optiondefs += (
                 ('pressEffect', 0, DGG.INITOPT),
+                ('popupMarkerBorder', (.1, .1), None),
             )
 
         # Merge keyword options with theme from gui_controller
@@ -114,6 +116,10 @@ class DirectOptionMenu(DirectButton):
         self.initialiseoptions(DirectOptionMenu)
         # Need to call this since we explicitly set frame size
         self.resetFrameSize()
+
+    def _update_marker_border(self):
+        if not self.fInit:
+            self.setItems()
 
     def _selected_item(self):
         if self["selectedItem"]:

@@ -5,7 +5,8 @@ import BetterDirectGui
 
 def test_most_types():
     import tests.most_gui_types as tg
-    tg.GUI(base.aspect2d)
+    gui = tg.GUI(base.aspect2d)
+    # gui.destroy()
 
 
 def test_nesting():
