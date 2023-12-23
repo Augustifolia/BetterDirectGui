@@ -52,6 +52,7 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
                 ('enableEdit', 1, self._enable_edit),
             )
 
+        # Do not override if it already exists
         if not hasattr(self, "_kw"):
             self._kw = {}
         if not hasattr(self, "_theme"):
@@ -203,10 +204,6 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
         super().unbind(event)
         if event == DGG.B1PRESS:  # Make sure _set_active is still bound
             self.bind(DGG.B1PRESS, self._set_active)
-
-    def destroy(self):
-        super().destroy()
-        # self["navigationMap"] = None
 
     def _set_active(self, event, skip_activate=True):
         if not base.gui_controller.do_keyboard_navigation:

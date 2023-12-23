@@ -28,7 +28,7 @@ class GuiController(DirectObject):
     """
 
     # An example theme (useful for testing)
-    gui_themes_ = {
+    _gui_themes = {
         "DirectButton": dict(
             borderWidth=(0.2, 0.2),
             # frameColor=(.2, 1.0, 1.0, 1.0),
@@ -46,8 +46,8 @@ class GuiController(DirectObject):
     gui_themes = None  # By default, no theme
     gui_theme_priority = -1
 
-    def __init__(self, base_np: p3d.NodePath = None, respect_sortOrder=True,
-                 do_bug_fixes=False, theme=None, do_keyboard_navigation=True, no_initopts=False):
+    def __init__(self, base_np: p3d.NodePath = None, respect_sortOrder=False,
+                 do_bug_fixes=True, theme=None, do_keyboard_navigation=True, no_initopts=True):
         super().__init__()
         base.gui_controller = self
         self._respect_sortOrder = respect_sortOrder
