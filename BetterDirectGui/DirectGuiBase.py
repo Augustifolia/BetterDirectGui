@@ -285,13 +285,15 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
         """Do the stuff that need to happen for element to be selected properly.
         Is both called when element is clicked and when selected with keyboard.
         """
-        print("activate")
+        # print("activate")
+        pass
 
     def deactivate(self):
         """Do the stuff that need to happen for element to be deselected properly.
         Is both called when element is clicked and when selected with keyboard.
         """
-        print("deactivate")
+        # print("deactivate")
+        pass
 
     def highlight(self):
         """Method to be called when element is the "current_selection"

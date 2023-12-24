@@ -176,11 +176,8 @@ class DirectEntry(DirectFrame):
         self["focus"] = 1
         self.show_click()
 
-    def activate(self):
-        print("activate")
-
     def deactivate(self):
-        print("deactivate")
+        # print("deactivate")
         self["focus"] = 0
 
     def destroy(self):

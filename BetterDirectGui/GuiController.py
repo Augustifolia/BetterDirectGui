@@ -235,7 +235,7 @@ class GuiController(DirectObject):
             else:
                 self._highlight(self._current_selection)
 
-        print("current_selection", value)
+        # print("current_selection", value)
 
     @staticmethod
     def _highlight(gui: DirectGuiBase.DirectGuiWidget):
@@ -266,7 +266,7 @@ class GuiController(DirectObject):
         c = self.current_selection
         if self._has_option(c, "selected"):
             c["selected"] = not c["selected"]
-            print("selected" if c["selected"] else "unselected", c)
+            # print("selected" if c["selected"] else "unselected", c)
             if c["selected"]:
                 self.deactivate_keys()
             else:
@@ -369,6 +369,9 @@ class GuiController(DirectObject):
         for child in children:
             if self._is_gui(child):
                 children_list.append(self._get_gui(child))
+            if child.name == "canvas_parent":
+                new_list = self._get_selectable_gui_children(child.children[0])
+                children_list.extend(new_list)
 
         if self._respect_sortOrder:
             children_list.sort(key=lambda c: c["sortOrder"], reverse=True)
@@ -381,11 +384,20 @@ class GuiController(DirectObject):
         for child in children:
             if self._is_selectable_gui(child):
                 children_list.append(self._get_gui(child))
+            if child.name == "canvas_parent":
+                new_list = self._get_selectable_gui_children(child.children[0])
+                children_list.extend(new_list)
 
         if self._respect_sortOrder:
             children_list.sort(key=lambda c: c["sortOrder"], reverse=True)
 
         return children_list
+
+    def _get_parent(self, np: p3d.NodePath) -> p3d.NodePath:
+        parent = np.parent
+        if parent.name == "canvas":
+            parent = parent.parent.parent
+        return parent
 
     def _get_next_on_level(self, parent: p3d.NodePath = None,
                            skip_np: p3d.NodePath = None) -> DirectGuiBase.DirectGuiWidget | None:
@@ -394,7 +406,7 @@ class GuiController(DirectObject):
             if self.current_selection is None:
                 parent = self._base_np
             else:
-                parent = self.current_selection.parent
+                parent = self._get_parent(self.current_selection)
 
         if not self._has_gui(parent):
             return None
@@ -426,7 +438,7 @@ class GuiController(DirectObject):
             if self.current_selection is None:
                 parent = self._base_np
             else:
-                parent = self.current_selection.parent
+                parent = self._get_parent(self.current_selection)
 
         if not self._has_gui(parent):
             return None
@@ -445,7 +457,7 @@ class GuiController(DirectObject):
                             next_item = self._get_gui(parent)
                         else:
                             self.current_selection = self._get_gui(parent)
-                            next_item = self._get_previous_on_level(parent.parent)
+                            next_item = self._get_previous_on_level(self._get_parent(parent))
 
                 else:
                     next_item = children[index - 1]
@@ -465,9 +477,9 @@ class GuiController(DirectObject):
         while True:
             while True:
                 if next_item is None:
-                    self.current_selection = self._get_gui(self._current_selection.parent)
+                    self.current_selection = self._get_gui(self._get_parent(self._current_selection))
                     if self.current_selection is not None:
-                        next_item = self._get_next_on_level(self.current_selection.parent,
+                        next_item = self._get_next_on_level(self._get_parent(self.current_selection),
                                                             skip_np=self.current_selection)
 
                     else:
@@ -481,7 +493,7 @@ class GuiController(DirectObject):
                     next_item = self._get_next_on_level(next_item)
                 else:
                     self.current_selection = next_item
-                    next_item = self._get_next_on_level(next_item.parent)
+                    next_item = self._get_next_on_level(self._get_parent(next_item))
             else:
                 break
 
@@ -494,15 +506,16 @@ class GuiController(DirectObject):
 
         while True:
             if next_item is None:
-                self.current_selection = self._get_gui(self._current_selection.parent)
-                next_item = self._get_previous_on_level(self.current_selection.parent, skip_np=self.current_selection)
+                self.current_selection = self._get_gui(self._get_parent(self._current_selection))
+                next_item = self._get_previous_on_level(self._get_parent(self.current_selection),
+                                                        skip_np=self.current_selection)
 
             if not self._is_selectable_gui(next_item):
                 if self._has_selectable_gui(next_item):
                     next_item = self._get_previous_on_level(next_item)
                 else:
                     self.current_selection = next_item
-                    next_item = self._get_previous_on_level(next_item.parent)
+                    next_item = self._get_previous_on_level(self._get_parent(next_item))
             else:
                 break
 
@@ -521,7 +534,7 @@ class GuiController(DirectObject):
             self.current_selection = next_item
             return
 
-        parent = self.current_selection.parent
+        parent = self._get_parent(self.current_selection)
         children = self._get_selectable_gui_children(parent)
         next_item = children[0]
         for index, child in enumerate(children):
@@ -546,7 +559,7 @@ class GuiController(DirectObject):
             self.current_selection = next_item
             return
 
-        parent = self.current_selection.parent
+        parent = self._get_parent(self.current_selection)
         children = self._get_selectable_gui_children(parent)
         next_item = children[0]
         for index, child in enumerate(children):
@@ -563,7 +576,7 @@ class GuiController(DirectObject):
         if self.current_selection is None:
             return
 
-        parent = self.current_selection.parent
+        parent = self._get_parent(self.current_selection)
         if parent == self._base_np:
             return
 
@@ -571,7 +584,7 @@ class GuiController(DirectObject):
             self.current_selection = self._get_gui(parent)
             return
 
-        children = self._get_gui_children(parent.parent)
+        children = self._get_gui_children(self._get_parent(parent))
         og_parent = parent
         for _ in range(500):
             if self._is_selectable_gui(parent):
@@ -586,7 +599,7 @@ class GuiController(DirectObject):
                     break
 
             if parent == og_parent:
-                parent = parent.parent
+                parent = self._get_parent(parent)
 
             if parent == self._base_np:
                 return
@@ -615,7 +628,7 @@ class GuiController(DirectObject):
             self.current_selection = child
             return
 
-        children = self._get_gui_children(self.current_selection.parent)
+        children = self._get_gui_children(self._get_parent(self.current_selection))
         for child in children:
             if self._has_selectable_gui(child):
                 guis = self._get_selectable_gui_children(child)
