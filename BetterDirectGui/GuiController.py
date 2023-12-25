@@ -79,6 +79,8 @@ class GuiController(DirectObject):
         }
         self._do_keyboard_navigation = do_keyboard_navigation
 
+        self._allowed_during_active = ["f", "b"]  # the directions that can be used to navigate while some element is selected
+
         if do_keyboard_navigation:
             self.activate_keys()
             self.accept("enter", self._activate)
@@ -109,6 +111,24 @@ class GuiController(DirectObject):
     def key_map(self):
         """The map used to decide what keyboard keys will activate which functions when navigating the gui."""
         return self._key_map
+
+    @property
+    def allowed_directions_while_selected(self):
+        """A list of the directions that are still active while some element is selected.
+        By default, "f" and "b" is enabled (corresponding to "tab" and "shift-tab").
+        This means that if you are writing in a DirectEntry you can navigate the text with the arrow keys,
+        but still be able to jump to the next element with "tab".
+        """
+        return self._allowed_during_active
+
+    @allowed_directions_while_selected.setter
+    def allowed_directions_while_selected(self, new_list: list[str]):
+        self._allowed_during_active = []
+        for arg in new_list:
+            if arg in self.key_map:
+                self._allowed_during_active.append(arg)
+            else:
+                print(f"warning: '{arg}' is not an defined direction for keyboard navigation")
 
     @property
     def respect_sortOrder(self):
@@ -186,6 +206,11 @@ class GuiController(DirectObject):
 
     def activate_keys(self):
         """Bind the keys in 'self.key_map' to the functions specified in 'self.key_map'."""
+        for key in self._allowed_during_active:
+            value = self.key_map[key]
+            if isinstance(value, tuple):
+                self.ignore(value[0])
+
         for key, value in self.key_map.items():
             if isinstance(value, tuple):
                 self.accept(value[0], self._navigate_next, extraArgs=[key])
@@ -196,6 +221,11 @@ class GuiController(DirectObject):
             if isinstance(value, tuple):
                 self.ignore(value[0])
 
+        for key in self._allowed_during_active:
+            value = self.key_map[key]
+            if isinstance(value, tuple):
+                self.accept(value[0], self._navigate_while_selected, extraArgs=[key])
+
     def _navigate_next(self, direction: str):
         if self.current_selection is None:
             self._default_implementation(direction)
@@ -205,6 +235,13 @@ class GuiController(DirectObject):
 
         else:
             self._default_implementation(direction)
+
+    def _navigate_while_selected(self, direction: str):
+        if self.current_selection is not None:
+            if self.current_selection["selected"]:
+                self._activate()
+
+        self._navigate_next(direction)
 
     def _default_implementation(self, direction: str):
         option = self.key_map[direction]

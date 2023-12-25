@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # This file was created using the DirectGUI Designer
+# To make it work with BetterDirectGui, the imports were replaced and a call to BetterDirectGui.init() was added.
 
 from direct.gui import DirectGuiGlobals as DGG
 
