@@ -110,14 +110,18 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
             suppressFlags |= p3d.MouseWatcherRegion.SFOtherButton
         self.guiItem.setSuppressFlags(suppressFlags)
 
-    def set_theme(self, theme: dict, priority=0):
+    def set_theme(self, theme: dict, priority=0, clear_old_theme=False):
         """Set theme of this element and its children to the specified theme.
 
         :param theme: The new theme.
         :param priority: Requires a higher value than the current themes priority to override.
+        :param clear_old_theme: Option to reset all options set by the old theme before setting the new one.
         """
         if priority <= self._theme_priority:
             return
+
+        if clear_old_theme:
+            self.clear_theme()
 
         self._theme_priority = priority
         self._theme = theme
@@ -176,7 +180,10 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
         else:
             return kw
 
-        theme = themes[name]
+        theme = {}
+        if name in themes:
+            theme = themes[name]
+
         kwargs = kw.copy()
         for key, value in theme.items():
             if key not in kwargs:

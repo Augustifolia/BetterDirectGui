@@ -485,6 +485,8 @@ class OkDialog(DirectDialog):
             ('buttonTextList',  ['OK'],       None),
             ('buttonValueList', [DGG.DIALOG_OK],          None),
             )
+        # Merge keyword options with theme from gui_controller
+        kw = self.add_theming_options(kw, parent)
         # Merge keyword options with default options
         self.defineoptions(kw, optiondefs)
         DirectDialog.__init__(self, parent)
@@ -498,6 +500,8 @@ class OkCancelDialog(DirectDialog):
             ('buttonTextList',  ['OK','Cancel'],       None),
             ('buttonValueList', [DGG.DIALOG_OK, DGG.DIALOG_CANCEL], None),
             )
+        # Merge keyword options with theme from gui_controller
+        kw = self.add_theming_options(kw, parent)
         # Merge keyword options with default options
         self.defineoptions(kw, optiondefs)
         DirectDialog.__init__(self, parent)
@@ -511,6 +515,8 @@ class YesNoDialog(DirectDialog):
             ('buttonTextList',  ['Yes', 'No'],       None),
             ('buttonValueList', [DGG.DIALOG_YES, DGG.DIALOG_NO], None),
             )
+        # Merge keyword options with theme from gui_controller
+        kw = self.add_theming_options(kw, parent)
         # Merge keyword options with default options
         self.defineoptions(kw, optiondefs)
         DirectDialog.__init__(self, parent)
@@ -524,6 +530,8 @@ class YesNoCancelDialog(DirectDialog):
             ('buttonTextList',  ['Yes', 'No', 'Cancel'],  None),
             ('buttonValueList', [DGG.DIALOG_YES, DGG.DIALOG_NO, DGG.DIALOG_CANCEL],  None),
             )
+        # Merge keyword options with theme from gui_controller
+        kw = self.add_theming_options(kw, parent)
         # Merge keyword options with default options
         self.defineoptions(kw, optiondefs)
         DirectDialog.__init__(self, parent)
@@ -537,6 +545,8 @@ class RetryCancelDialog(DirectDialog):
             ('buttonTextList',  ['Retry','Cancel'],   None),
             ('buttonValueList', [DGG.DIALOG_RETRY, DGG.DIALOG_CANCEL], None),
             )
+        # Merge keyword options with theme from gui_controller
+        kw = self.add_theming_options(kw, parent)
         # Merge keyword options with default options
         self.defineoptions(kw, optiondefs)
         DirectDialog.__init__(self, parent)

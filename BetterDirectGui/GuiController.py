@@ -55,14 +55,14 @@ class GuiController(DirectObject):
         self._do_bug_fixes = do_bug_fixes
         self._do_theming = True
         self._no_initopts = no_initopts
+        if base_np is None:
+            base_np = base.aspect2d
+        self._base_np = base_np
         if theme is not None:
             self.set_theme(theme)
 
         self._skip_activate = False
 
-        if base_np is None:
-            base_np = base.aspect2d
-        self._base_np = base_np
         self._current_selection: DirectGuiBase.DirectGuiWidget | None = None
         self._current_pos: DirectGuiBase.DirectGuiWidget | None = None
 
