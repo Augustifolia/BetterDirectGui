@@ -30,8 +30,7 @@ def test_inverted_scrollbar():
 if __name__ == '__main__':
     base = ShowBase()  # init ShowBase
     base.accept("escape", base.userExit)
-    BetterDirectGui.init(respect_sortOrder=False, do_bug_fixes=True, do_keyboard_navigation=True, no_initopts=True)  # init BetterDirectGui after ShowBase
-    # base.gui_controller.update_key_map()
+    BetterDirectGui.init()  # init BetterDirectGui after ShowBase
 
     # create some gui
     run_test = 0

@@ -34,8 +34,13 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
         }
 
         optiondefs = (
+            # Is this element able to be selected, or is it skipped when navigating with keyboard
             ('selectable',     False,         None),
+            # Is this element the currently selected element (activates when user presses "enter")
             ('selected',       False,         self.set_selected),
+            # if user should be able to exit this element with some key from "allowed_directions_while_selected" while this element is selected
+            ('allowExit',      True,          None),
+            # map to specify explicitly how to navigate from this element
             ('navigationMap',  navigationMap, None)
         )
 
@@ -71,6 +76,7 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
         # Call option initialization functions
         self.initialiseoptions(DirectGuiWidget)
 
+        # make sure to update stuff for keyboard navigation when self is pressed with the mouse.
         self.bind(DGG.B1PRESS, self._set_active)
 
     def _set_pos(self):
@@ -110,7 +116,7 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
             suppressFlags |= p3d.MouseWatcherRegion.SFOtherButton
         self.guiItem.setSuppressFlags(suppressFlags)
 
-    def set_theme(self, theme: dict, priority=0, clear_old_theme=False):
+    def set_theme(self, theme: dict, priority=0, clear_old_theme=True):
         """Set theme of this element and its children to the specified theme.
 
         :param theme: The new theme.

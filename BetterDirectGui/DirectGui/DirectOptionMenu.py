@@ -44,6 +44,7 @@ class DirectOptionMenu(DirectButton):
             # Remove press effect because it looks a bit funny
             # ('pressEffect',     0,          DGG.INITOPT),
             ('selectable',      True,       None),
+            ('allowExit',       False,      None),
             ('downFunc',        True,       None),
             ('upFunc',          True,       None)
            )

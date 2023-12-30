@@ -124,6 +124,11 @@ def main():
     }
     # set a global theme for everything
     BetterDirectGui.init(theme=theme)
+    # alternatively use:
+    # base.gui_controller.set_theme(theme)
+    # clear a global theme:
+    # base.gui_controller.clear_theme()
+
     gui = GUI()
 
     button_theme = {
@@ -132,8 +137,10 @@ def main():
             scale=0.2
         )
     }
-    # set a different theme for the button, currently this does not reset the options set by the previous theme
+    # set a different theme for the button, this will override the old theme.
     gui.pg215.set_theme(button_theme, 1)
+    # If you wish to keep the options set by the old theme, set the option "clear_old_theme" to False.
+    # gui.pg215.set_theme(button_theme, 1, clear_old_theme=False)
 
     # clear the theme for the "Ok" button on the OkDialog, this resets all options from the last set theme
     gui.pg3127.buttonList[0].clear_theme()

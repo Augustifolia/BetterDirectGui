@@ -43,11 +43,11 @@ class GUI:
             # parent=self.pg2153,
             initialText="hello"
         )
-        print(self.pg2152["enteredText"])
+        # print(self.pg2152["enteredText"])
         self.pg2152["enteredText"] = "some string"
-        print(self.pg2152["enteredText"])
+        # print(self.pg2152["enteredText"])
         self.pg2152.set("other")
-        print(self.pg2152["enteredText"])
+        # print(self.pg2152["enteredText"])
         self.pg2152.setTransparency(0)
         self.pg2153 = DirectEntryScroll(
             parent=rootParent,
@@ -100,7 +100,7 @@ class GUI:
         )
         self.pg5339.setTransparency(0)
         self.pg5339["selectedItem"] = "button2"
-        print(self.pg5339["selectedItem"])
+        # print(self.pg5339["selectedItem"])
         self.pg5339["pressEffect"] = 1
         self.pg5339["highlightColor"] = (1, 0.2, 0.2, 1)
         self.pg5339["popupMarkerBorder"] = (.1, .1)

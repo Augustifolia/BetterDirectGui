@@ -50,14 +50,14 @@ base.run()
 
 `BetterDirectGui.init()` also has some options that changes how BetterDirectGui works. By default, all features are enabled.
 
-| Option Name            | Description                                                                                                                                                               | Default value |
-|------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------|
-| do_keyboard_navigation | Toggle to disable keyboard navigation                                                                                                                                     | True          |   
-| base_np                | The base node-path that keyboard navigation and global theming will start from                                                                                            | aspect2d      |   
-| respect_sortOrder      | This specifies whether keyboard navigation will sort elements according to their sortOrder, or if the order from np.getChildren() will be used                            | False         |
-| theme                  | A dict with the global theme to use                                                                                                                                       | None          |
-| no_initopts            | Setting to make (almost) all INITOPT:s editable after widget creation. It also affects some other options that did not have any affect when changed after widget creation | True          |
-| do_bug_fixes           | Is intended to fix some minor issues                                                                                                                                      | True          |
+| Option Name            | Description                                                                                                                                                                          | Default value |
+|------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------|
+| do_keyboard_navigation | Toggle to disable keyboard navigation                                                                                                                                                | True          |   
+| base_np                | The base node-path that keyboard navigation and global theming will "start" from. In other words: global themes and keyboard navigation will only affect the children of the base_np | aspect2d      |   
+| respect_sortOrder      | This specifies whether keyboard navigation will sort elements according to their sortOrder, or if the order from np.getChildren() will be used                                       | False         |
+| theme                  | A dict with the global theme to use                                                                                                                                                  | None          |
+| no_initopts            | Setting to make (almost) all INITOPT:s editable after widget creation. It also affects some other options that did not have any affect when changed after widget creation            | True          |
+| do_bug_fixes           | Is intended to fix some minor issues                                                                                                                                                 | True          |
 
 ## Keyboard Navigation:
 By default, BetterDirectGui will use the scene-graph to infer the jump order for keyboard navigation.

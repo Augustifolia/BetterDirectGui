@@ -215,7 +215,7 @@ class GuiController(DirectObject):
             if isinstance(value, tuple):
                 self.accept(value[0], self._navigate_next, extraArgs=[key])
 
-    def deactivate_keys(self):
+    def deactivate_keys(self, current_selection=None):
         """Unbind the keys in 'self.key_map'."""
         for key, value in self.key_map.items():
             if isinstance(value, tuple):
@@ -224,6 +224,8 @@ class GuiController(DirectObject):
         for key in self._allowed_during_active:
             value = self.key_map[key]
             if isinstance(value, tuple):
+                if current_selection is not None and not current_selection["allowExit"]:
+                    continue
                 self.accept(value[0], self._navigate_while_selected, extraArgs=[key])
 
     def _navigate_next(self, direction: str):
@@ -238,6 +240,9 @@ class GuiController(DirectObject):
 
     def _navigate_while_selected(self, direction: str):
         if self.current_selection is not None:
+            if not self.current_selection["allowExit"]:
+                return
+
             if self.current_selection["selected"]:
                 self._activate()
 
@@ -302,10 +307,10 @@ class GuiController(DirectObject):
 
         c = self.current_selection
         if self._has_option(c, "selected"):
+            selected_element = self.current_selection
             c["selected"] = not c["selected"]
-            # print("selected" if c["selected"] else "unselected", c)
             if c["selected"]:
-                self.deactivate_keys()
+                self.deactivate_keys(selected_element)
             else:
                 self.activate_keys()
 
