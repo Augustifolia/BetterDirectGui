@@ -63,6 +63,7 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
         if not hasattr(self, "_theme"):
             self._theme: dict[str, Any] | None = None
             self._theme_priority = -1
+        self._dont_edit = []  # list of stuff not to touch when clearing a theme, this has already been handled
 
         # Merge keyword options with theme from gui_controller
         kw = self.add_theming_options(kw, parent)
@@ -118,6 +119,7 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
 
     def set_theme(self, theme: dict, priority=0, clear_old_theme=True):
         """Set theme of this element and its children to the specified theme.
+        The method to call to change the theme after widget creation.
 
         :param theme: The new theme.
         :param priority: Requires a higher value than the current themes priority to override.
@@ -137,20 +139,58 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
                 if key in self._kw:
                     continue
 
-                self[key] = value
+                self.configure(**{key: value})
+                # self[key] = value
 
         children = base.gui_controller._get_gui_children(self)
         for child in children:
             child.set_theme(theme, priority)
+
+    def __setitem__(self, key, value):
+        super().__setitem__(key, value)
+        self._kw[key] = value
 
     def clear_theme(self):
         """Remove the theming options from this element and its children."""
         if self._theme is None:
             return
 
-        for name, default, func in self.options():
-            if name in self._theme[type(self).__name__] and name not in self._kw:
-                self[name] = default
+        name = type(self).__name__
+        if name in self._theme:
+            options = {option[0]: option[1] for option in self.options()}  # dict with name and default value for self
+            print(options)
+            for key in self._theme[name]:
+                print(key)
+                if key in self._dont_edit:
+                    self._dont_edit.remove(key)
+                    continue
+                if "_" in key:
+                    index = key.rfind("_")
+                    try:
+                        comp = self.component(key[:index])
+                    except KeyError:
+                        default = None
+                        comp = None
+                    else:
+                        option_name = key[index + 1:]
+                        config = comp._optionInfo[option_name]
+                        default = config[DGG._OPT_DEFAULT]
+                        if option_name in self._kw:
+                            default = self._kw[option_name]
+                    try:
+                        if self[key] != default and self[key] != self._theme[name][key]:  # kw not updated, happens when "comp_option" instead of gui.comp["option"]
+                            default = self[key]
+                            if comp is not None:
+                                comp._dont_edit.append(option_name)
+                        self[key] = default
+                    except KeyError:  # sometimes we try to access options of comps that does not exist, i.e. "text_pos"
+                        pass
+
+                elif key not in self._kw:
+                    default = options[key]
+                    self[key] = default
+                elif key in self._kw:
+                    self[key] = self._kw[key]
 
         self._theme_priority = -1
         self._theme = None
@@ -160,7 +200,7 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
             child.clear_theme()
 
     def add_theming_options(self, kw: dict, parent: DirectGuiWidget | None):
-        """Merge kw with the theming specified in guiController.
+        """Merge kw with the theming specified in guiController. Only to be used during initialization.
 
         :param parent: The parent element of self
         :param kw: The keywords given by the user.
