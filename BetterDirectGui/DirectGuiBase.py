@@ -5,6 +5,8 @@ import direct.gui.DirectGuiGlobals as DGG
 import panda3d.core as p3d
 
 from typing import Any
+from collections.abc import MutableSequence, MutableMapping, MutableSet
+from copy import deepcopy
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -65,8 +67,8 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
             self._theme_priority = -1
         self._dont_edit = []  # list of stuff not to touch when clearing a theme, this has already been handled
 
-        # Merge keyword options with theme from gui_controller
-        kw = self.add_theming_options(kw, parent)
+        # Do some theme handling. This should be called before "defineoptions"
+        self.add_theming_options(kw, parent)
 
         # Merge keyword options with default options
         self.defineoptions(kw, optiondefs)
@@ -79,6 +81,9 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
 
         # make sure to update stuff for keyboard navigation when self is pressed with the mouse.
         self.bind(DGG.B1PRESS, self._set_active)
+
+        # actually apply the theme
+        self.init_theme()
 
     def _set_pos(self):
         if self['pos']:
@@ -117,6 +122,50 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
             suppressFlags |= p3d.MouseWatcherRegion.SFOtherButton
         self.guiItem.setSuppressFlags(suppressFlags)
 
+    def addoptions(self, optionDefs, optionkeywords):
+        """ addoptions(optionDefs) - add option def to option info """
+        # Add additional options, providing the default value and the
+        # method to call when the value is changed.  See
+        # "defineoptions" for more details
+
+        # optimisations:
+        optionInfo = self._optionInfo
+        optionInfo_has_key = optionInfo.__contains__
+        keywords = self._constructorKeywords
+        keywords_has_key = keywords.__contains__
+        FUNCTION = DGG._OPT_FUNCTION
+
+        for name, default, function in optionDefs:
+            if '_' not in name:
+                default = optionkeywords.get(name, default)
+                # The option will already exist if it has been defined
+                # in a derived class.  In this case, do not override the
+                # default value of the option or the callback function
+                # if it is not None.
+                if not optionInfo_has_key(name):
+                    if keywords_has_key(name):
+                        # Overridden by keyword, use keyword value
+                        value = keywords[name][0]
+                        optionInfo[name] = [default, value, function]
+                        # Delete it from self._constructorKeywords
+                        del keywords[name]
+                    else:
+                        # Use optionDefs value
+                        value = default
+                        if isinstance(default, (MutableSequence, MutableMapping, MutableSet)):  # some bug fixing
+                            value = deepcopy(default)
+                        optionInfo[name] = [default, value, function]
+                elif optionInfo[name][FUNCTION] is None:
+                    # Only override function if not defined by derived class
+                    optionInfo[name][FUNCTION] = function
+            else:
+                # This option is of the form "component_option".  If this is
+                # not already defined in self._constructorKeywords add it.
+                # This allows a derived class to override the default value
+                # of an option of a component of a base class.
+                if not keywords_has_key(name):
+                    keywords[name] = [default, 0]
+
     def set_theme(self, theme: dict, priority=0, clear_old_theme=True):
         """Set theme of this element and its children to the specified theme.
         The method to call to change the theme after widget creation.
@@ -129,21 +178,49 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
             return
 
         if clear_old_theme:
-            self.clear_theme()
+            self.clear_theme()  # reset any options set by the last theme
 
         self._theme_priority = priority
         self._theme = theme
+        self._apply_theme()
+
+    def init_theme(self):
+        """Used internally to initialize a theme at init time. Do not call directly."""
+        if not base.gui_controller._do_theming:
+            return
+
+        if not hasattr(self, "_dont_edit"):
+            self._dont_edit = []
+        else:
+            return
+        self._apply_theme()
+
+    def _apply_theme(self):
+        theme = self._theme
+        priority = self._theme_priority
         if type(self).__name__ in theme:
-            gui_theme = theme[type(self).__name__]
+            gui_theme = theme[type(self).__name__]  # get theme for this gui-type
             for key, value in gui_theme.items():
-                if key in self._kw:
+                if key in self._kw:  # make sure to not override value set by user
+                    value = self._kw[key]
+
+                if key in self._dont_edit:  # some ancestor has already handled this value
+                    self._dont_edit.remove(key)
                     continue
 
                 self.configure(**{key: value})
-                # self[key] = value
+                if "_" in key:  # the option is for some component
+                    index = key.rfind("_")
+                    try:
+                        comp = self.component(key[:index])
+                    except KeyError:
+                        pass
+                    else:
+                        option_name = key[index + 1:]
+                        comp._dont_edit.append(option_name)  # make sure the component doesn't override the value just set
 
         children = base.gui_controller._get_gui_children(self)
-        for child in children:
+        for child in children:  # propagate the theme to the children
             child.set_theme(theme, priority)
 
     def __setitem__(self, key, value):
@@ -157,46 +234,34 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
 
         name = type(self).__name__
         if name in self._theme:
-            options = {option[0]: option[1] for option in self.options()}  # dict with name and default value for self
-            print(options)
-            for key in self._theme[name]:
-                print(key)
-                if key in self._dont_edit:
-                    self._dont_edit.remove(key)
-                    continue
-                if "_" in key:
+            options = {option[0]: option[1] for option in self.options()}  # dict with name and default value for options of self
+            theme = self._theme[name]
+            for key in theme:
+                if "_" in key:  # this option is for a component of self
                     index = key.rfind("_")
                     try:
                         comp = self.component(key[:index])
                     except KeyError:
                         default = None
-                        comp = None
                     else:
                         option_name = key[index + 1:]
                         config = comp._optionInfo[option_name]
-                        default = config[DGG._OPT_DEFAULT]
-                        if option_name in self._kw:
+                        default = config[DGG._OPT_DEFAULT]  # get default value
+                        if option_name in self._kw:  # if user has set the option, use that value instead
                             default = self._kw[option_name]
-                    try:
-                        if self[key] != default and self[key] != self._theme[name][key]:  # kw not updated, happens when "comp_option" instead of gui.comp["option"]
-                            default = self[key]
-                            if comp is not None:
-                                comp._dont_edit.append(option_name)
-                        self[key] = default
-                    except KeyError:  # sometimes we try to access options of comps that does not exist, i.e. "text_pos"
-                        pass
+                    self.configure(**{key: default})
 
-                elif key not in self._kw:
-                    default = options[key]
-                    self[key] = default
-                elif key in self._kw:
-                    self[key] = self._kw[key]
+                # if the current value is different from the theme, the user has overriden the value and we should not change it
+                elif self[key] == theme[key]:
+                    if key not in self._kw:  # value has not been set, reset to default
+                        default = options[key]
+                        self.configure(**{key: default})
 
         self._theme_priority = -1
         self._theme = None
 
         children = base.gui_controller._get_gui_children(self)
-        for child in children:
+        for child in children:  # clear the theme for the children
             child.clear_theme()
 
     def add_theming_options(self, kw: dict, parent: DirectGuiWidget | None):
@@ -210,7 +275,7 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
             self._kw = kw.copy()
 
         if not base.gui_controller._do_theming:
-            return kw
+            return
 
         name = type(self).__name__
         if base.gui_controller._is_gui(parent) and parent._theme is not None:
@@ -222,20 +287,6 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
             themes = base.gui_controller.gui_themes
             self._theme = themes
             self._theme_priority = base.gui_controller.gui_theme_priority
-
-        else:
-            return kw
-
-        theme = {}
-        if name in themes:
-            theme = themes[name]
-
-        kwargs = kw.copy()
-        for key, value in theme.items():
-            if key not in kwargs:
-                kwargs[key] = value
-
-        return kwargs
 
     def bind(self, event, command, extraArgs=[]):
         """Bind the command (which should expect one arg) to the specified

@@ -53,8 +53,8 @@ class DirectFrame(DirectGuiWidget):
             ('textMayChange',  1,          None),
             )
 
-        # Merge keyword options with theme from gui_controller
-        kw = self.add_theming_options(kw, parent)
+        # Do some theme handling. This should be called before "defineoptions"
+        self.add_theming_options(kw, parent)
 
         # Merge keyword options with default options
         self.defineoptions(kw, optiondefs,
@@ -65,6 +65,8 @@ class DirectFrame(DirectGuiWidget):
 
         # Call option initialization functions
         self.initialiseoptions(DirectFrame)
+        # actually apply the theme
+        self.init_theme()
 
     def destroy(self):
         DirectGuiWidget.destroy(self)

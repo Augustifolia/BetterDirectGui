@@ -41,8 +41,8 @@ class DirectScrolledFrame(DirectFrame):
             ('scrollBarWidth', 0.08,               self.setScrollBarWidth),
             ('borderWidth',    (0.01, 0.01),       self.setBorderWidth),
             )
-        # Merge keyword options with theme from gui_controller
-        kw = self.add_theming_options(kw, parent)
+        # Do some theme handling. This should be called before "defineoptions"
+        self.add_theming_options(kw, parent)
 
         # Merge keyword options with default options
         self.defineoptions(kw, optiondefs)
@@ -78,6 +78,8 @@ class DirectScrolledFrame(DirectFrame):
 
         # Call option initialization functions
         self.initialiseoptions(DirectScrolledFrame)
+        # actually apply the theme
+        self.init_theme()
 
     def setScrollBarWidth(self):
         if self.fInit: return

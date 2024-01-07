@@ -56,8 +56,8 @@ class DirectSlider(DirectFrame):
                 ('frameVisibleScale', (1, 0.25),        None),
                 )
 
-        # Merge keyword options with theme from gui_controller
-        kw = self.add_theming_options(kw, parent)
+        # Do some theme handling. This should be called before "defineoptions"
+        self.add_theming_options(kw, parent)
 
         # Merge keyword options with default options
         self.defineoptions(kw, optiondefs)
@@ -90,6 +90,8 @@ class DirectSlider(DirectFrame):
 
         # Call option initialization functions
         self.initialiseoptions(DirectSlider)
+        # actually apply the theme
+        self.init_theme()
 
     def activate(self):
         self.setup_keyboard_navigation()

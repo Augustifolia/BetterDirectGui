@@ -58,8 +58,8 @@ class DirectButton(DirectFrame):
                 ('pressEffect', 1, DGG.INITOPT),
             )
 
-        # Merge keyword options with theme from gui_controller
-        kw = self.add_theming_options(kw, parent)
+        # Do some theme handling. This should be called before "defineoptions"
+        self.add_theming_options(kw, parent)
 
         # Merge keyword options with default options
         self.defineoptions(kw, optiondefs)
@@ -91,6 +91,9 @@ class DirectButton(DirectFrame):
                   Mat4.scaleMat(0.98) * \
                   Mat4.translateMat(centerX, 0, centerY)
             pressEffectNP.setMat(mat)
+
+        # actually apply the theme
+        self.init_theme()
 
     def _press_effect(self):
         if self["pressEffect"]:

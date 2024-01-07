@@ -96,8 +96,8 @@ class DirectEntry(DirectFrame):
                 ('entryFont', None, DGG.INITOPT),
             )
 
-        # Merge keyword options with theme from gui_controller
-        kw = self.add_theming_options(kw, parent)
+        # Do some theme handling. This should be called before "defineoptions"
+        self.add_theming_options(kw, parent)
 
         # Merge keyword options with default options
         self.defineoptions(kw, optiondefs)
@@ -161,9 +161,14 @@ class DirectEntry(DirectFrame):
         if self['initialText']:
             self.enterText(self['initialText'])
 
+        # actually apply the theme
+        self.init_theme()
+
     def _enteredText(self):
         if self["enteredText"]:
             self.enterText(self["enteredText"])
+        elif self["enteredText"] is None:
+            self.enterText("")
 
     def _entry_font(self):
         if not self['entryFont']:

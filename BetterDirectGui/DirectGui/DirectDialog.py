@@ -152,8 +152,8 @@ class DirectDialog(DirectFrame):
                 ('buttonPadSF', 1.1, DGG.INITOPT),
                 ('fadeScreen', 0, None),
             )
-        # Merge keyword options with theme from gui_controller
-        kw = self.add_theming_options(kw, parent)
+        # Do some theme handling. This should be called before "defineoptions"
+        self.add_theming_options(kw, parent)
 
         # Merge keyword options with default options
         self.defineoptions(kw, optiondefs, dynamicGroups = ("button",))
@@ -218,6 +218,8 @@ class DirectDialog(DirectFrame):
         # Update dialog when everything has been initialised
         self.postInitialiseFuncList.append(self.configureDialog)
         self.initialiseoptions(DirectDialog)
+        # actually apply the theme
+        self.init_theme()
 
     def _update_fade_screen(self):
         if self['fadeScreen']:
@@ -229,11 +231,11 @@ class DirectDialog(DirectFrame):
 
     def _update_buttons(self):
         # Determine number of buttons
+        old_num_buttons = self.numButtons
         self.numButtons = max(len(self['buttonTextList']),
                               len(self['buttonGeomList']),
                               len(self['buttonImageList']),
-                              len(self['buttonValueList']),
-                              self.numButtons)
+                              len(self['buttonValueList']))
         # Create buttons
         for i in range(self.numButtons):
             name = 'Button' + repr(i)
@@ -281,6 +283,12 @@ class DirectDialog(DirectFrame):
                 button["geom"] = geom
                 button["image"] = image
                 button["command"] = lambda s=self, v=value: s.buttonCommand(v)
+
+        if old_num_buttons > self.numButtons:
+            for i in range(self.numButtons, old_num_buttons):
+                self.buttonList[i].destroy()
+
+        self.buttonList = self.buttonList[:self.numButtons]
 
         self.configureDialog()
 
@@ -485,12 +493,15 @@ class OkDialog(DirectDialog):
             ('buttonTextList',  ['OK'],       None),
             ('buttonValueList', [DGG.DIALOG_OK],          None),
             )
-        # Merge keyword options with theme from gui_controller
-        kw = self.add_theming_options(kw, parent)
+        # Do some theme handling. This should be called before "defineoptions"
+        self.add_theming_options(kw, parent)
         # Merge keyword options with default options
         self.defineoptions(kw, optiondefs)
         DirectDialog.__init__(self, parent)
         self.initialiseoptions(OkDialog)
+        # actually apply the theme
+        self.init_theme()
+
 
 class OkCancelDialog(DirectDialog):
     def __init__(self, parent = None, **kw):
@@ -500,12 +511,15 @@ class OkCancelDialog(DirectDialog):
             ('buttonTextList',  ['OK','Cancel'],       None),
             ('buttonValueList', [DGG.DIALOG_OK, DGG.DIALOG_CANCEL], None),
             )
-        # Merge keyword options with theme from gui_controller
-        kw = self.add_theming_options(kw, parent)
+        # Do some theme handling. This should be called before "defineoptions"
+        self.add_theming_options(kw, parent)
         # Merge keyword options with default options
         self.defineoptions(kw, optiondefs)
         DirectDialog.__init__(self, parent)
         self.initialiseoptions(OkCancelDialog)
+        # actually apply the theme
+        self.init_theme()
+
 
 class YesNoDialog(DirectDialog):
     def __init__(self, parent = None, **kw):
@@ -515,12 +529,15 @@ class YesNoDialog(DirectDialog):
             ('buttonTextList',  ['Yes', 'No'],       None),
             ('buttonValueList', [DGG.DIALOG_YES, DGG.DIALOG_NO], None),
             )
-        # Merge keyword options with theme from gui_controller
-        kw = self.add_theming_options(kw, parent)
+        # Do some theme handling. This should be called before "defineoptions"
+        self.add_theming_options(kw, parent)
         # Merge keyword options with default options
         self.defineoptions(kw, optiondefs)
         DirectDialog.__init__(self, parent)
         self.initialiseoptions(YesNoDialog)
+        # actually apply the theme
+        self.init_theme()
+
 
 class YesNoCancelDialog(DirectDialog):
     def __init__(self, parent = None, **kw):
@@ -530,12 +547,15 @@ class YesNoCancelDialog(DirectDialog):
             ('buttonTextList',  ['Yes', 'No', 'Cancel'],  None),
             ('buttonValueList', [DGG.DIALOG_YES, DGG.DIALOG_NO, DGG.DIALOG_CANCEL],  None),
             )
-        # Merge keyword options with theme from gui_controller
-        kw = self.add_theming_options(kw, parent)
+        # Do some theme handling. This should be called before "defineoptions"
+        self.add_theming_options(kw, parent)
         # Merge keyword options with default options
         self.defineoptions(kw, optiondefs)
         DirectDialog.__init__(self, parent)
         self.initialiseoptions(YesNoCancelDialog)
+        # actually apply the theme
+        self.init_theme()
+
 
 class RetryCancelDialog(DirectDialog):
     def __init__(self, parent = None, **kw):
@@ -545,10 +565,11 @@ class RetryCancelDialog(DirectDialog):
             ('buttonTextList',  ['Retry','Cancel'],   None),
             ('buttonValueList', [DGG.DIALOG_RETRY, DGG.DIALOG_CANCEL], None),
             )
-        # Merge keyword options with theme from gui_controller
-        kw = self.add_theming_options(kw, parent)
+        # Do some theme handling. This should be called before "defineoptions"
+        self.add_theming_options(kw, parent)
         # Merge keyword options with default options
         self.defineoptions(kw, optiondefs)
         DirectDialog.__init__(self, parent)
         self.initialiseoptions(RetryCancelDialog)
-
+        # actually apply the theme
+        self.init_theme()

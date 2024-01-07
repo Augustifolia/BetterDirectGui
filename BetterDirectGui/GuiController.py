@@ -412,7 +412,7 @@ class GuiController(DirectObject):
             if self._is_gui(child):
                 children_list.append(self._get_gui(child))
             if child.name == "canvas_parent":
-                new_list = self._get_selectable_gui_children(child.children[0])
+                new_list = self._get_gui_children(child.children[0])
                 children_list.extend(new_list)
 
         if self._respect_sortOrder:

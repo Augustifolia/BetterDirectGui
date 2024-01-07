@@ -14,8 +14,8 @@ class DirectEntryScroll(DirectFrame):
             ('clipSize',     (-1, 1, -1, 1),    self.setClipSize),
             ('selectable',   False,             None),
             )
-        # Merge keyword options with theme from gui_controller
-        kw = self.add_theming_options(kw, parent)
+        # Do some theme handling. This should be called before "defineoptions"
+        self.add_theming_options(kw, parent)
 
         self.defineoptions(kw, optiondefs)
         DirectFrame.__init__(self, parent, **kw)
@@ -44,6 +44,8 @@ class DirectEntryScroll(DirectFrame):
         self.canvas.node().setBounds(OmniBoundingVolume())
         self.canvas.node().setFinal(1)
         self.resetCanvas()
+        # actually apply the theme
+        self.init_theme()
 
     def setEntry(self, entry):
         """
