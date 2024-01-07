@@ -162,7 +162,7 @@ class DirectEntry(DirectFrame):
             self.enterText(self['initialText'])
 
         # actually apply the theme
-        self.init_theme()
+        self.init_theme(DirectEntry)
 
     def _enteredText(self):
         if self["enteredText"]:

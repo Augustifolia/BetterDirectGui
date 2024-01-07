@@ -45,7 +45,7 @@ class DirectEntryScroll(DirectFrame):
         self.canvas.node().setFinal(1)
         self.resetCanvas()
         # actually apply the theme
-        self.init_theme()
+        self.init_theme(DirectEntryScroll)
 
     def setEntry(self, entry):
         """

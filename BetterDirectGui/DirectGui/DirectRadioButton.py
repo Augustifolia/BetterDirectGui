@@ -133,7 +133,7 @@ class DirectRadioButton(DirectButton):
             self.check()
 
         # actually apply the theme
-        self.init_theme()
+        self.init_theme(DirectRadioButton)
 
     def _update_box_geom_image(self):
         skip = False

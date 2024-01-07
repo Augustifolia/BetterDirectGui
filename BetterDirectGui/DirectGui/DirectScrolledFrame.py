@@ -79,7 +79,7 @@ class DirectScrolledFrame(DirectFrame):
         # Call option initialization functions
         self.initialiseoptions(DirectScrolledFrame)
         # actually apply the theme
-        self.init_theme()
+        self.init_theme(DirectScrolledFrame)
 
     def setScrollBarWidth(self):
         if self.fInit: return

@@ -91,7 +91,7 @@ class DirectSlider(DirectFrame):
         # Call option initialization functions
         self.initialiseoptions(DirectSlider)
         # actually apply the theme
-        self.init_theme()
+        self.init_theme(DirectSlider)
 
     def activate(self):
         self.setup_keyboard_navigation()

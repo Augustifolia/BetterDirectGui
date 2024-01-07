@@ -93,7 +93,7 @@ class DirectButton(DirectFrame):
             pressEffectNP.setMat(mat)
 
         # actually apply the theme
-        self.init_theme()
+        self.init_theme(DirectButton)
 
     def _press_effect(self):
         if self["pressEffect"]:

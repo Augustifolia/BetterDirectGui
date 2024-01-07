@@ -65,7 +65,7 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
         if not hasattr(self, "_theme"):
             self._theme: dict[str, Any] | None = None
             self._theme_priority = -1
-        self._dont_edit = []  # list of stuff not to touch when clearing a theme, this has already been handled
+        self._dont_edit = []  # list of stuff not to touch when setting a theme, this has already been handled
 
         # Do some theme handling. This should be called before "defineoptions"
         self.add_theming_options(kw, parent)
@@ -83,7 +83,7 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
         self.bind(DGG.B1PRESS, self._set_active)
 
         # actually apply the theme
-        self.init_theme()
+        self.init_theme(DirectGuiWidget)
 
     def _set_pos(self):
         if self['pos']:
@@ -184,21 +184,22 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
         self._theme = theme
         self._apply_theme()
 
-    def init_theme(self):
+    def init_theme(self, myClass):
         """Used internally to initialize a theme at init time. Do not call directly."""
+        # This is to make sure this method class is only called by
+        # the most specific class in the class hierarchy
+        if self.__class__ is not myClass:
+            return
+
         if not base.gui_controller._do_theming:
             return
 
-        if not hasattr(self, "_dont_edit"):
-            self._dont_edit = []
-        else:
-            return
         self._apply_theme()
 
     def _apply_theme(self):
         theme = self._theme
         priority = self._theme_priority
-        if type(self).__name__ in theme:
+        if theme is not None and type(self).__name__ in theme:
             gui_theme = theme[type(self).__name__]  # get theme for this gui-type
             for key, value in gui_theme.items():
                 if key in self._kw:  # make sure to not override value set by user

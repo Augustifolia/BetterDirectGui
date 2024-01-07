@@ -118,7 +118,7 @@ class DirectOptionMenu(DirectButton):
         # Need to call this since we explicitly set frame size
         self.resetFrameSize()
         # actually apply the theme
-        self.init_theme()
+        self.init_theme(DirectOptionMenu)
 
     def _update_marker_border(self):
         if not self.fInit:

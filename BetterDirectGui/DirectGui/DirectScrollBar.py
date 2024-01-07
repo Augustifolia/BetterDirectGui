@@ -110,7 +110,7 @@ class DirectScrollBar(DirectFrame):
         # Call option initialization functions
         self.initialiseoptions(DirectScrollBar)
         # actually apply the theme
-        self.init_theme()
+        self.init_theme(DirectScrollBar)
 
     def activate(self):
         self.setup_keyboard_navigation()

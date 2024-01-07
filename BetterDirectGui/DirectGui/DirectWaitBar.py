@@ -63,7 +63,7 @@ class DirectWaitBar(DirectFrame):
         self.initialiseoptions(DirectWaitBar)
         self.updateBarStyle()
         # actually apply the theme
-        self.init_theme()
+        self.init_theme(DirectWaitBar)
 
     def destroy(self):
         self.barStyle = None

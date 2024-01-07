@@ -219,7 +219,7 @@ class DirectDialog(DirectFrame):
         self.postInitialiseFuncList.append(self.configureDialog)
         self.initialiseoptions(DirectDialog)
         # actually apply the theme
-        self.init_theme()
+        self.init_theme(DirectDialog)
 
     def _update_fade_screen(self):
         if self['fadeScreen']:
@@ -500,7 +500,7 @@ class OkDialog(DirectDialog):
         DirectDialog.__init__(self, parent)
         self.initialiseoptions(OkDialog)
         # actually apply the theme
-        self.init_theme()
+        self.init_theme(OkDialog)
 
 
 class OkCancelDialog(DirectDialog):
@@ -518,7 +518,7 @@ class OkCancelDialog(DirectDialog):
         DirectDialog.__init__(self, parent)
         self.initialiseoptions(OkCancelDialog)
         # actually apply the theme
-        self.init_theme()
+        self.init_theme(OkCancelDialog)
 
 
 class YesNoDialog(DirectDialog):
@@ -536,7 +536,7 @@ class YesNoDialog(DirectDialog):
         DirectDialog.__init__(self, parent)
         self.initialiseoptions(YesNoDialog)
         # actually apply the theme
-        self.init_theme()
+        self.init_theme(YesNoDialog)
 
 
 class YesNoCancelDialog(DirectDialog):
@@ -554,7 +554,7 @@ class YesNoCancelDialog(DirectDialog):
         DirectDialog.__init__(self, parent)
         self.initialiseoptions(YesNoCancelDialog)
         # actually apply the theme
-        self.init_theme()
+        self.init_theme(YesNoCancelDialog)
 
 
 class RetryCancelDialog(DirectDialog):
@@ -572,4 +572,4 @@ class RetryCancelDialog(DirectDialog):
         DirectDialog.__init__(self, parent)
         self.initialiseoptions(RetryCancelDialog)
         # actually apply the theme
-        self.init_theme()
+        self.init_theme(RetryCancelDialog)

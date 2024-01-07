@@ -99,7 +99,7 @@ class DirectCheckButton(DirectButton):
             self.component('indicator')['image_color'] = VBase4(0, 0, 0, 0)
 
         # actually apply the theme
-        self.init_theme()
+        self.init_theme(DirectCheckButton)
 
     def _update_box_relief(self):
         self.indicator["relief"] = self["boxRelief"]

@@ -68,7 +68,7 @@ class DirectCheckBox(DirectButton):
                 self.resetFrameSize()
 
         # actually apply the theme
-        self.init_theme()
+        self.init_theme(DirectCheckBox)
 
     def _update_image(self):
         if self['isChecked']:

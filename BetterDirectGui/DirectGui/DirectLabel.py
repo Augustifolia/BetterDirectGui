@@ -45,7 +45,7 @@ class DirectLabel(DirectFrame):
         # Call option initialization functions
         self.initialiseoptions(DirectLabel)
         # actually apply the theme
-        self.init_theme()
+        self.init_theme(DirectLabel)
 
     def setActiveState(self):
         """ setActiveState - change label to specifed state """

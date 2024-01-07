@@ -66,7 +66,7 @@ class DirectFrame(DirectGuiWidget):
         # Call option initialization functions
         self.initialiseoptions(DirectFrame)
         # actually apply the theme
-        self.init_theme()
+        self.init_theme(DirectFrame)
 
     def destroy(self):
         DirectGuiWidget.destroy(self)

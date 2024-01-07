@@ -105,7 +105,7 @@ def main():
             borderWidth=(0.4, 0.4)
         ),
         "DirectEntry": dict(
-            initialText="initial text"
+            enteredText="initial text"
         ),
         "DirectCheckButton": dict(
             indicatorValue=1
@@ -125,11 +125,11 @@ def main():
     # set a global theme for everything
     BetterDirectGui.init(theme=theme)
     # alternatively use:
-    # base.gui_controller.set_theme(theme)
     # clear a global theme:
     # base.gui_controller.clear_theme()
 
     gui = GUI()
+    # base.gui_controller.set_theme(theme, 1)
 
     button_theme = {
         "DirectButton": dict(
