@@ -1,9 +1,9 @@
 """Imports all of the :ref:`directgui` classes."""
 
 from direct.gui import DirectGuiGlobals as DGG
-from direct.gui.OnscreenText import *
-from direct.gui.OnscreenGeom import *
-from direct.gui.OnscreenImage import *
+from .OnscreenText import *
+from .OnscreenGeom import *
+from .OnscreenImage import *
 
 # MPG DirectStart should call this?
 # Set up default font

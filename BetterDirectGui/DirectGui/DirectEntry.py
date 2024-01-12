@@ -165,9 +165,9 @@ class DirectEntry(DirectFrame):
         self.init_theme(DirectEntry)
 
     def _enteredText(self):
-        if self["enteredText"]:
+        if self["enteredText"] is not None:
             self.enterText(self["enteredText"])
-        elif self["enteredText"] is None:
+        else:
             self.enterText("")
 
     def _entry_font(self):

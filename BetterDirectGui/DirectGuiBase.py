@@ -63,9 +63,9 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
         if not hasattr(self, "_kw"):
             self._kw = {}
         if not hasattr(self, "_theme"):
-            self._theme: dict[str, Any] | None = None
+            self._theme: dict[str, dict[str: Any]] | None = None
             self._theme_priority = -1
-        self._dont_edit = []  # list of stuff not to touch when setting a theme, this has already been handled
+        self._dont_edit: list[str] = []  # list of stuff not to touch when setting a theme, this has already been handled
 
         # Do some theme handling. This should be called before "defineoptions"
         self.add_theming_options(kw, parent)
@@ -212,13 +212,18 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
                 self.configure(**{key: value})
                 if "_" in key:  # the option is for some component
                     index = key.rfind("_")
+                    comp_name = key[:index]
+                    if not self.hascomponent(comp_name):  # for example "text" is not a component, but "text0" is
+                        comp_name += "0"
                     try:
-                        comp = self.component(key[:index])
-                    except KeyError:
-                        pass
+                        comp = self.component(comp_name)
+                    except KeyError as e:
+                        if key[:index] not in self._dynamicGroups:
+                            raise e  # this is a bug, throw the error again
                     else:
                         option_name = key[index + 1:]
-                        comp._dont_edit.append(option_name)  # make sure the component doesn't override the value just set
+                        if hasattr(comp, "_dont_edit"):  # OnscreenText/Image/Geom does not have that
+                            comp._dont_edit.append(option_name)  # make sure the component doesn't override the value just set
 
         children = base.gui_controller._get_gui_children(self)
         for child in children:  # propagate the theme to the children
@@ -240,17 +245,22 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
             for key in theme:
                 if "_" in key:  # this option is for a component of self
                     index = key.rfind("_")
+                    comp_name = key[:index]
+
+                    if not self.hascomponent(comp_name):  # for example "text" is not a component, but "text0" is
+                        comp_name += "0"
+
                     try:
-                        comp = self.component(key[:index])
-                    except KeyError:
-                        default = None
+                        comp = self.component(comp_name)
+                    except KeyError as e:
+                        if key[:index] not in self._dynamicGroups:
+                            raise e  # this is a bug, throw the error again
                     else:
                         option_name = key[index + 1:]
-                        config = comp._optionInfo[option_name]
-                        default = config[DGG._OPT_DEFAULT]  # get default value
-                        if option_name in self._kw:  # if user has set the option, use that value instead
-                            default = self._kw[option_name]
-                    self.configure(**{key: default})
+                        default = comp.get_default(option_name)
+                        if key in self._kw:  # if user has set the option, use that value instead
+                            default = self._kw[key]
+                        self.configure(**{key: default})
 
                 # if the current value is different from the theme, the user has overriden the value and we should not change it
                 elif self[key] == theme[key]:
@@ -274,6 +284,8 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
         """
         if not hasattr(self, "_kw"):
             self._kw = kw.copy()
+        else:
+            return
 
         if not base.gui_controller._do_theming:
             return
@@ -288,6 +300,10 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
             themes = base.gui_controller.gui_themes
             self._theme = themes
             self._theme_priority = base.gui_controller.gui_theme_priority
+
+    def get_default(self, option_name: str) -> Any:
+        config = self._optionInfo[option_name]
+        return config[DGG._OPT_DEFAULT]
 
     def bind(self, event, command, extraArgs=[]):
         """Bind the command (which should expect one arg) to the specified
