@@ -66,9 +66,6 @@ class DirectCheckButton(DirectButton):
                 ('boxRelief', 'sunken', None),
             )
 
-        # Do some theme handling. This should be called before "defineoptions"
-        self.add_theming_options(kw, parent)
-
         # Merge keyword options with default options
         self.defineoptions(kw, optiondefs)
         # Initialize superclasses
@@ -98,8 +95,8 @@ class DirectCheckButton(DirectButton):
             self.colors = [VBase4(0, 0, 0, 0), self['boxImageColor']]
             self.component('indicator')['image_color'] = VBase4(0, 0, 0, 0)
 
-        # actually apply the theme
-        self.init_theme(DirectCheckButton)
+        # Apply the theme to self
+        self.add_theming_options(kw, parent, DirectCheckButton)
 
     def _update_box_relief(self):
         self.indicator["relief"] = self["boxRelief"]

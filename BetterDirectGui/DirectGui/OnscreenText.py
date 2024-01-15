@@ -5,7 +5,7 @@ from typing import Any
 from collections.abc import MutableMapping, MutableSet, MutableSequence
 
 import direct.gui.OnscreenText as ot
-# from panda3d.core import TextProperties
+from panda3d.core import TextProperties
 
 __all__ = ['OnscreenText', 'Plain', 'ScreenTitle', 'ScreenPrompt', 'NameConfirm', 'BlackOnWhite']
 
@@ -79,7 +79,7 @@ class OnscreenText(ot.OnscreenText):
         self._defaults["parent"] = self["parent"]
         self._defaults["sort"] = self["sort"]
         # self._defaults["mayChange"] = self["mayChange"]
-        # self._defaults["direction"] = self["direction"]
+        self._defaults["direction"] = self["direction"]
 
         for key, value in self._defaults.items():
             # Trying to copy some options can cause a crash, so only copy what we have to.
@@ -126,17 +126,18 @@ class OnscreenText(ot.OnscreenText):
             # Otherwise, remove the shadow.
             self.textNode.clearShadow()
 
-    # def setDirection(self, direction):
-    #     if direction is not None:
-    #         if isinstance(direction, str):
-    #             direction = direction.lower()
-    #             if direction == 'rtl':
-    #                 direction = TextProperties.D_rtl
-    #             elif direction == 'ltr':
-    #                 direction = TextProperties.D_ltr
-    #             else:
-    #                 raise ValueError('invalid direction')
-    #         self.textNode.setDirection(direction)
+    def setDirection(self, direction):
+        """Toggle to make the text go from left to right or right to left. Requires harfbuzz to be enabled."""
+        if direction is not None:
+            if isinstance(direction, str):
+                direction = direction.lower()
+                if direction == 'rtl':
+                    direction = TextProperties.D_rtl
+                elif direction == 'ltr':
+                    direction = TextProperties.D_ltr
+                else:
+                    raise ValueError('invalid direction')
+            self.textNode.setDirection(direction)
 
-    # def getDirection(self):
-    #     return self.textNode.getDirection()
+    def getDirection(self):
+        return self.textNode.getDirection()

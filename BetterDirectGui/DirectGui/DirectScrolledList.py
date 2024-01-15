@@ -44,13 +44,12 @@ class DirectScrolledListItem(DirectButton):
             ('command', self.select, None),
             ('selectable', True, None),
             )
-        # Do some theme handling. This should be called before "defineoptions"
-        self.add_theming_options(kw, parent)
         # Merge keyword options with default options
         self.defineoptions(kw, optiondefs)
         DirectButton.__init__(self)
         self.initialiseoptions(DirectScrolledListItem)
-        self.init_theme(DirectScrolledListItem)
+        # Apply the theme to self
+        self.add_theming_options(kw, parent, DirectScrolledListItem)
 
     def select(self):
         assert self.notify.debugStateCall(self)
@@ -113,9 +112,6 @@ class DirectScrolledList(DirectFrame):
                 ('itemsWordwrap', None, DGG.INITOPT),
             )
 
-        # Do some theme handling. This should be called before "defineoptions"
-        self.add_theming_options(kw, parent)
-
         # Merge keyword options with default options
         self.defineoptions(kw, optiondefs)
 
@@ -150,8 +146,8 @@ class DirectScrolledList(DirectFrame):
         self.initialiseoptions(DirectScrolledList)
         self.recordMaxHeight()
         self.scrollTo(0)
-        # actually apply the theme
-        self.init_theme(DirectScrolledList)
+        # Apply the theme to self
+        self.add_theming_options(kw, parent, DirectScrolledList)
 
     def _items_align(self):
         if not self["itemsAlign"]:

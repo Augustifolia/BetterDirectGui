@@ -52,9 +52,6 @@ class DirectCheckBox(DirectButton):
                 ('isChecked', False, None),
             )
 
-        # Do some theme handling. This should be called before "defineoptions"
-        self.add_theming_options(kw, parent)
-
         # Merge keyword options with default options
         self.defineoptions(kw, optiondefs)
 
@@ -67,8 +64,8 @@ class DirectCheckBox(DirectButton):
             if self["frameSize"] is None:
                 self.resetFrameSize()
 
-        # actually apply the theme
-        self.init_theme(DirectCheckBox)
+        # Apply the theme to self
+        self.add_theming_options(kw, parent, DirectCheckBox)
 
     def _update_image(self):
         if self['isChecked']:

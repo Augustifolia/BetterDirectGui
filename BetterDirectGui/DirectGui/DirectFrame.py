@@ -54,9 +54,6 @@ class DirectFrame(DirectGuiWidget):
             ('textMayChange',  1,          None),
             )
 
-        # Do some theme handling. This should be called before "defineoptions"
-        self.add_theming_options(kw, parent)
-
         # Merge keyword options with default options
         self.defineoptions(kw, optiondefs,
                            dynamicGroups = DirectFrame.DefDynGroups)
@@ -66,8 +63,8 @@ class DirectFrame(DirectGuiWidget):
 
         # Call option initialization functions
         self.initialiseoptions(DirectFrame)
-        # actually apply the theme
-        self.init_theme(DirectFrame)
+        # Apply the theme to self
+        self.add_theming_options(kw, parent, DirectFrame)
 
     def destroy(self):
         DirectGuiWidget.destroy(self)

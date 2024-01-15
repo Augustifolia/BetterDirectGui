@@ -61,9 +61,6 @@ class DirectOptionMenu(DirectButton):
                 ('popupMarkerBorder', (.1, .1), None),
             )
 
-        # Do some theme handling. This should be called before "defineoptions"
-        self.add_theming_options(kw, parent)
-
         # Merge keyword options with default options
         self.defineoptions(kw, optiondefs)
         # Initialize superclasses
@@ -117,8 +114,8 @@ class DirectOptionMenu(DirectButton):
         self.initialiseoptions(DirectOptionMenu)
         # Need to call this since we explicitly set frame size
         self.resetFrameSize()
-        # actually apply the theme
-        self.init_theme(DirectOptionMenu)
+        # Apply the theme to self
+        self.add_theming_options(kw, parent, DirectOptionMenu)
 
     def _update_marker_border(self):
         if not self.fInit:

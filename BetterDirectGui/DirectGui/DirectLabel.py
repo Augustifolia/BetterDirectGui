@@ -33,8 +33,6 @@ class DirectLabel(DirectFrame):
             ('state',           self.inactiveInitState, None),
             ('activeState',     0,         self.setActiveState),
             )
-        # Do some theme handling. This should be called before "defineoptions"
-        self.add_theming_options(kw, parent)
 
         # Merge keyword options with default options
         self.defineoptions(kw, optiondefs)
@@ -44,8 +42,8 @@ class DirectLabel(DirectFrame):
 
         # Call option initialization functions
         self.initialiseoptions(DirectLabel)
-        # actually apply the theme
-        self.init_theme(DirectLabel)
+        # Apply the theme to self
+        self.add_theming_options(kw, parent, DirectLabel)
 
     def setActiveState(self):
         """ setActiveState - change label to specifed state """

@@ -65,10 +65,7 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
         if not hasattr(self, "_theme"):
             self._theme: dict[str, dict[str: Any]] | None = None
             self._theme_priority = -1
-        self._dont_edit: list[str] = []  # list of stuff not to touch when setting a theme, this has already been handled
-
-        # Do some theme handling. This should be called before "defineoptions"
-        self.add_theming_options(kw, parent)
+        self._dont_edit: set[str] = set()  # set of stuff not to touch when setting a theme, this has already been handled
 
         # Merge keyword options with default options
         self.defineoptions(kw, optiondefs)
@@ -82,8 +79,8 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
         # make sure to update stuff for keyboard navigation when self is pressed with the mouse.
         self.bind(DGG.B1PRESS, self._set_active)
 
-        # actually apply the theme
-        self.init_theme(DirectGuiWidget)
+        # Apply the theme to self
+        self.add_theming_options(kw, parent, DirectGuiWidget)
 
     def _set_pos(self):
         if self['pos']:
@@ -184,46 +181,46 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
         self._theme = theme
         self._apply_theme()
 
-    def init_theme(self, myClass):
-        """Used internally to initialize a theme at init time. Do not call directly."""
-        # This is to make sure this method class is only called by
-        # the most specific class in the class hierarchy
-        if self.__class__ is not myClass:
-            return
-
-        if not base.gui_controller._do_theming:
-            return
-
-        self._apply_theme()
-
     def _apply_theme(self):
         theme = self._theme
         priority = self._theme_priority
-        if theme is not None and type(self).__name__ in theme:
-            gui_theme = theme[type(self).__name__]  # get theme for this gui-type
-            for key, value in gui_theme.items():
-                if key in self._kw:  # make sure to not override value set by user
-                    value = self._kw[key]
+        if theme is None:
+            return
 
-                if key in self._dont_edit:  # some ancestor has already handled this value
-                    self._dont_edit.remove(key)
-                    continue
+        name = type(self).__name__
 
-                self.configure(**{key: value})
-                if "_" in key:  # the option is for some component
-                    index = key.rfind("_")
-                    comp_name = key[:index]
-                    if not self.hascomponent(comp_name):  # for example "text" is not a component, but "text0" is
-                        comp_name += "0"
-                    try:
-                        comp = self.component(comp_name)
-                    except KeyError as e:
-                        if key[:index] not in self._dynamicGroups:
-                            raise e  # this is a bug, throw the error again
-                    else:
-                        option_name = key[index + 1:]
-                        if hasattr(comp, "_dont_edit"):  # OnscreenText/Image/Geom does not have that
-                            comp._dont_edit.append(option_name)  # make sure the component doesn't override the value just set
+        gui_theme = {}
+        if name in theme:
+            gui_theme = theme[name]  # get theme for this gui-type
+        # merge general options, the specific theme for this element overrides values from the general theme
+        if "general" in theme:
+            gen_theme = theme["general"].copy()
+            gen_theme.update(gui_theme)
+            gui_theme = gen_theme
+
+        for key, value in gui_theme.items():
+            if key in self._kw:  # make sure to not override value set by user
+                value = self._kw[key]
+
+            if key in self._dont_edit:  # some ancestor has already handled this value
+                self._dont_edit.remove(key)
+                continue
+
+            self.configure(**{key: value})
+            if "_" in key:  # the option is for some component
+                index = key.rfind("_")
+                comp_name = key[:index]
+                if not self.hascomponent(comp_name):  # for example "text" is not a component, but "text0" is
+                    comp_name += "0"
+                try:
+                    comp = self.component(comp_name)
+                except KeyError as e:
+                    if key[:index] not in self._dynamicGroups:
+                        raise e  # this is a bug, throw the error again
+                else:
+                    option_name = key[index + 1:]
+                    if hasattr(comp, "_dont_edit"):  # OnscreenText/Image/Geom does not have that
+                        comp._dont_edit.add(option_name)  # make sure the component doesn't override the value just set
 
         children = base.gui_controller._get_gui_children(self)
         for child in children:  # propagate the theme to the children
@@ -231,7 +228,7 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
 
     def __setitem__(self, key, value):
         super().__setitem__(key, value)
-        self._kw[key] = value
+        self._kw[key] = value  # keep track of the options set directly by the user, used for themability
 
     def clear_theme(self):
         """Remove the theming options from this element and its children."""
@@ -239,34 +236,40 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
             return
 
         name = type(self).__name__
+        options = {option[0]: option[1] for option in self.options()}  # dict with name and default value for options of self
+        theme = {}
         if name in self._theme:
-            options = {option[0]: option[1] for option in self.options()}  # dict with name and default value for options of self
             theme = self._theme[name]
-            for key in theme:
-                if "_" in key:  # this option is for a component of self
-                    index = key.rfind("_")
-                    comp_name = key[:index]
+        if "general" in self._theme:
+            gen_theme: dict[str: Any] = self._theme["general"].copy()
+            gen_theme.update(theme)
+            theme = gen_theme
 
-                    if not self.hascomponent(comp_name):  # for example "text" is not a component, but "text0" is
-                        comp_name += "0"
+        for key in theme:
+            if "_" in key:  # this option is for a component of self
+                index = key.rfind("_")
+                comp_name = key[:index]
 
-                    try:
-                        comp = self.component(comp_name)
-                    except KeyError as e:
-                        if key[:index] not in self._dynamicGroups:
-                            raise e  # this is a bug, throw the error again
-                    else:
-                        option_name = key[index + 1:]
-                        default = comp.get_default(option_name)
-                        if key in self._kw:  # if user has set the option, use that value instead
-                            default = self._kw[key]
-                        self.configure(**{key: default})
+                if not self.hascomponent(comp_name):  # for example "text" is not a component, but "text0" is
+                    comp_name += "0"
 
-                # if the current value is different from the theme, the user has overriden the value and we should not change it
-                elif self[key] == theme[key]:
-                    if key not in self._kw:  # value has not been set, reset to default
-                        default = options[key]
-                        self.configure(**{key: default})
+                try:
+                    comp = self.component(comp_name)
+                except KeyError as e:
+                    if key[:index] not in self._dynamicGroups:
+                        raise e  # this is a bug, throw the error again
+                else:
+                    option_name = key[index + 1:]
+                    default = comp.get_default(option_name)
+                    if key in self._kw:  # if user has set the option, use that value instead
+                        default = self._kw[key]
+                    self.configure(**{key: default})
+
+            # if the current value is different from the theme, the user has overriden the value and we should not change it
+            elif self[key] == theme[key]:
+                if key not in self._kw:  # value has not been set, reset to default
+                    default = options[key]
+                    self.configure(**{key: default})
 
         self._theme_priority = -1
         self._theme = None
@@ -275,17 +278,17 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
         for child in children:  # clear the theme for the children
             child.clear_theme()
 
-    def add_theming_options(self, kw: dict, parent: DirectGuiWidget | None):
+    def add_theming_options(self, kw: dict, parent: DirectGuiWidget | None, myClass):
         """Merge kw with the theming specified in guiController. Only to be used during initialization.
 
         :param parent: The parent element of self
         :param kw: The keywords given by the user.
         :return: kw
         """
-        if not hasattr(self, "_kw"):
-            self._kw = kw.copy()
-        else:
+        if self.__class__ is not myClass:
             return
+
+        self._kw = kw.copy()
 
         if not base.gui_controller._do_theming:
             return
@@ -300,6 +303,8 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
             themes = base.gui_controller.gui_themes
             self._theme = themes
             self._theme_priority = base.gui_controller.gui_theme_priority
+
+        self._apply_theme()
 
     def get_default(self, option_name: str) -> Any:
         config = self._optionInfo[option_name]

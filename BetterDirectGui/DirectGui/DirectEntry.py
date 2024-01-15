@@ -11,7 +11,7 @@ from panda3d.core import *
 from direct.showbase import ShowBaseGlobal
 from direct.gui import DirectGuiGlobals as DGG
 from .DirectFrame import *
-from direct.gui.OnscreenText import OnscreenText
+from BetterDirectGui.DirectGui.OnscreenText import OnscreenText
 import sys
 # import this to make sure it gets pulled into the publish
 import encodings.utf_8
@@ -96,9 +96,6 @@ class DirectEntry(DirectFrame):
                 ('entryFont', None, DGG.INITOPT),
             )
 
-        # Do some theme handling. This should be called before "defineoptions"
-        self.add_theming_options(kw, parent)
-
         # Merge keyword options with default options
         self.defineoptions(kw, optiondefs)
 
@@ -161,8 +158,8 @@ class DirectEntry(DirectFrame):
         if self['initialText']:
             self.enterText(self['initialText'])
 
-        # actually apply the theme
-        self.init_theme(DirectEntry)
+        # Apply the theme to self
+        self.add_theming_options(kw, parent, DirectEntry)
 
     def _enteredText(self):
         if self["enteredText"] is not None:

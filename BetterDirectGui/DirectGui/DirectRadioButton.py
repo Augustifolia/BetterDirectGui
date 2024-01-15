@@ -84,9 +84,6 @@ class DirectRadioButton(DirectButton):
                 ('boxRelief', None, None),
             )
 
-        # Do some theme handling. This should be called before "defineoptions"
-        self.add_theming_options(kw, parent)
-
         # Merge keyword options with default options
         self.defineoptions(kw, optiondefs)
         # Initialize superclasses
@@ -132,8 +129,8 @@ class DirectRadioButton(DirectButton):
         if needToCheck:
             self.check()
 
-        # actually apply the theme
-        self.init_theme(DirectRadioButton)
+        # Apply the theme to self
+        self.add_theming_options(kw, parent, DirectRadioButton)
 
     def _update_box_geom_image(self):
         skip = False
