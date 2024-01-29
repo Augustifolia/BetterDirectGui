@@ -261,7 +261,7 @@ class DirectOptionMenu(DirectButton):
         bounds[1] += pmw
         self['frameSize'] = (bounds[0], bounds[1], bounds[2], bounds[3])
         # Set initial state
-        self.hidePopupMenu()
+        self.hidePopupMenu(skip_key_handling=True)
 
     def showPopupMenu(self, event = None):
         """
@@ -312,12 +312,12 @@ class DirectOptionMenu(DirectButton):
         self.cancelFrame.setPos(ShowBaseGlobal.render2d, 0, 0, 0)
         self.cancelFrame.setScale(ShowBaseGlobal.render2d, 1, 1, 1)
 
-    def hidePopupMenu(self, event=None):
+    def hidePopupMenu(self, event=None, skip_key_handling=False):
         """ Put away popup and cancel frame """
         self.popupMenu.hide()
         self.cancelFrame.hide()
         self.ignore_keyboard_navigation()
-        if not self.fInit:
+        if not self.fInit and not skip_key_handling:
             base.gui_controller.current_selection = self
 
     def _hide_popup_menu_cancel_frame(self, event=None):
