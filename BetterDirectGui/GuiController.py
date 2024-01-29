@@ -27,22 +27,6 @@ class GuiController(DirectObject):
     :param no_initopts: Bool for making all initopts editable after gui creation.
     """
 
-    # An example theme (useful for testing)
-    _gui_themes = {
-        "DirectButton": dict(
-            borderWidth=(0.2, 0.2),
-            # frameColor=(.2, 1.0, 1.0, 1.0),
-            pad=(0.2, 0.2),
-            pos=(0, 0, 0),
-            hpr=(0, 0, 30),
-            scale=(0.1, 0.1, 0.1),
-            text='button',
-        ),
-        "DirectFrame": dict(
-            # frameSize=(-1, 1, -0.5, 0.5),
-            text="frame"
-        )
-    }
     gui_themes = None  # By default, no theme
     gui_theme_priority = -1
 
@@ -62,6 +46,7 @@ class GuiController(DirectObject):
             self.set_theme(theme)
 
         self._skip_activate = False
+        self._do_highlight = True
 
         self._current_selection: DirectGuiBase.DirectGuiWidget | None = None
         self._current_pos: DirectGuiBase.DirectGuiWidget | None = None
@@ -77,13 +62,16 @@ class GuiController(DirectObject):
             "f": ("tab", self._next_selectable_gui),  # 'forward' move to next item (to next gui node in the node-graph)
             "b": ("shift-tab", self._previous_selectable_gui)  # 'backward' inverse of 'forward' (backward in the node-graph)
         }
+        self._activation_key = "enter"
+        self._unhighlight_key = "mouse3"
         self._do_keyboard_navigation = do_keyboard_navigation
 
         self._allowed_during_active = ["f", "b"]  # the directions that can be used to navigate while some element is selected
 
         if do_keyboard_navigation:
             self.activate_keys()
-            self.accept("enter", self._activate)
+            self.accept(self._activation_key, self._activate)
+            self.accept(self._unhighlight_key, self._unhighlight_when_no_key_nav, extraArgs=[])
 
         self.highlight_color = (0.7, 0.7, 0.7, 1)
 
@@ -202,7 +190,25 @@ class GuiController(DirectObject):
 
         :param key: The new key.
         """
+        self.ignore(self._activation_key)
         self.accept(key, self._activate)
+        self._activation_key = key
+
+    def update_unhighlight_key(self, key: str):
+        """Used to set the key to press to unhighlight the currently selected gui. By default, mouse3.
+
+        :param key: The new key.
+        """
+        self.ignore(self._unhighlight_key)
+        self.accept(key, self._unhighlight_when_no_key_nav, extraArgs=[])
+        self._unhighlight_key = key
+
+    def _unhighlight_when_no_key_nav(self):
+        if self.current_selection is not None:
+            if hasattr(self.current_selection, "unhighlight"):
+                self.current_selection.unhighlight()
+            else:
+                self._unhighlight(self.current_selection)
 
     def activate_keys(self):
         """Bind the keys in 'self.key_map' to the functions specified in 'self.key_map'."""
@@ -279,10 +285,12 @@ class GuiController(DirectObject):
 
         # print("current_selection", value)
 
-    @staticmethod
-    def _highlight(gui: DirectGuiBase.DirectGuiWidget):
+    def _highlight(self, gui: DirectGuiBase.DirectGuiWidget):
+        if not self._do_highlight:
+            return
+
         gui._color_scale = gui.getColorScale()
-        gui.setColorScale(*base.gui_controller.highlight_color)
+        gui.setColorScale(*self.highlight_color)
 
     @staticmethod
     def _unhighlight(gui: DirectGuiBase.DirectGuiWidget):

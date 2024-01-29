@@ -335,6 +335,8 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
         if not base.gui_controller.do_keyboard_navigation:
             return
 
+        base.gui_controller._do_highlight = False
+
         if self["selectable"]:
             if base.gui_controller.current_selection is not None and base.gui_controller.current_selection is not self:
                 base.gui_controller.current_selection["selected"] = False
@@ -346,6 +348,8 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
                 base.gui_controller._skip_activate = False
             else:
                 base.gui_controller._activate()
+
+        base.gui_controller._do_highlight = True
 
     def navigate_next(self, direction: str = "f"):
         """Navigate to next gui element in 'direction'.
@@ -424,6 +428,9 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
     def highlight(self):
         """Method to be called when element is the "current_selection"
         (not selected, just the current node for the GuiController) to highlight it."""
+        if not base.gui_controller._do_highlight:
+            return
+
         self._color_scale = p3d.LVecBase4(self.getColorScale())
         self.setColorScale(*base.gui_controller.highlight_color)
 

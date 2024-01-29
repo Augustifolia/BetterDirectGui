@@ -105,7 +105,7 @@ class DirectOptionMenu(DirectButton):
         # Make sure this is on top of all the other widgets
         self.cancelFrame.setBin('gui-popup', 0)
         self.cancelFrame.node().setBounds(OmniBoundingVolume())
-        self.cancelFrame.bind(DGG.B1PRESS, self.hidePopupMenu)
+        self.cancelFrame.bind(DGG.B1PRESS, self._hide_popup_menu_cancel_frame)
         # Default action on press is to show popup menu
         self.bind(DGG.B1PRESS, self.showPopupMenu)
         # Check if item is highlighted on release and select it if it is
@@ -132,9 +132,6 @@ class DirectOptionMenu(DirectButton):
 
     def deactivate(self):
         self.hidePopupMenu()
-        self.ignore_keyboard_navigation()
-        if not self.fInit:
-            base.gui_controller.current_selection = self
 
     def setup_keyboard_navigation(self):
         down_func = self["downFunc"]
@@ -315,10 +312,18 @@ class DirectOptionMenu(DirectButton):
         self.cancelFrame.setPos(ShowBaseGlobal.render2d, 0, 0, 0)
         self.cancelFrame.setScale(ShowBaseGlobal.render2d, 1, 1, 1)
 
-    def hidePopupMenu(self, event = None):
+    def hidePopupMenu(self, event=None):
         """ Put away popup and cancel frame """
         self.popupMenu.hide()
         self.cancelFrame.hide()
+        self.ignore_keyboard_navigation()
+        if not self.fInit:
+            base.gui_controller.current_selection = self
+
+    def _hide_popup_menu_cancel_frame(self, event=None):
+        self.hidePopupMenu()
+        if event is not None:
+            base.gui_controller._activate()
 
     def _highlightItem(self, item, index):
         """ Set frame color of highlighted item, record index """

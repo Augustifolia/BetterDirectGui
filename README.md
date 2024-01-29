@@ -189,8 +189,9 @@ theme = {
 When a theme is set on some element, that theme will propagate down the scene-graph and set the theme for the children of the element (and their children and so on recursively).
 When a theme is set globally, that theme will be set for all children of the base_np (specified in `BetterDirectGui.init`) recursively.
 
-One limitation of changing the theme on some element after it was created is that any init options specified in the theme will not be changed. 
-Therefore, it is recommended to either set a global theme at init time, or setting the option `no_initopts` to True.
+Themability relies on that all options for the gui-objects are editable after created. 
+Otherwise, that option will not be set in the theme.
+Therefore, it is recommended to keep the option `no_initopts` to True.
 
 To remove a theme globally or from a specific element, use `base.gui_controller.clear_theme()` or `some_element.clear_theme()` respectively.
 Just like `set_theme` this will propagate down the scene-graph.

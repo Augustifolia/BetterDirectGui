@@ -59,9 +59,14 @@ if __name__ == '__main__':
                 text_shadowOffset=(0.05, 0.05),
                 relief=DGG.FLAT,
                 frameTexture="models/maps/circle.png",
-                # frameTexture="BetterDirectGui/assets/corner.png",
+                # frameTexture="BetterDirectGui/BDGAssets/corner.png",
                 transparency=True,
-                frameColor=(.1, .67, .3, 1)
+                frameColor=(.1, .67, .3, 1),
+                # compositeFrameTexture=dict(
+                #     edge="BetterDirectGui/BDGAssets/edge.png",
+                #     corner="BetterDirectGui/BDGAssets/corner.png",
+                #     center="BetterDirectGui/BDGAssets/center.png",
+                # )
             ),
             "DirectButton": dict(
                 frameColor=(0.1, 1, 1, 1),
