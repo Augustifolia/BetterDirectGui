@@ -11,6 +11,10 @@ from direct.gui import DirectGuiGlobals as DGG
 from .DirectFrame import *
 from .DirectScrollBar import *
 
+DGG.MWUP = PGButton.getPressPrefix() + MouseButton.wheel_up().getName() + '-'
+DGG.MWDOWN = PGButton.getPressPrefix() + MouseButton.wheel_down().getName() + '-'
+
+
 """
 import DirectScrolledFrame
 d = DirectScrolledFrame(borderWidth=(0, 0))
@@ -40,6 +44,8 @@ class DirectScrolledFrame(DirectFrame):
             ('autoHideScrollBars', 1,              self.setAutoHideScrollBars),
             ('scrollBarWidth', 0.08,               self.setScrollBarWidth),
             ('borderWidth',    (0.01, 0.01),       self.setBorderWidth),
+            ('enableScrollWheel', True,            self.enableScroll),
+            ('horizontalScrollKey', 'shift',       self.enableScroll),
             )
 
         # Merge keyword options with default options
@@ -78,6 +84,62 @@ class DirectScrolledFrame(DirectFrame):
         self.initialiseoptions(DirectScrolledFrame)
         # Apply the theme to self
         self.add_theming_options(kw, parent, DirectScrolledFrame)
+
+    def scrollStep(self, direction, steps):
+        if direction == "v":
+            active_bar = self.verticalScroll
+        elif direction == "h":
+            active_bar = self.horizontalScroll
+        else:
+            raise ValueError("An invalid value for 'direction' was passed, it should be the string 'v' or 'h'")
+
+        active_bar.scrollStep(steps)
+
+    def setup_scroll_bind(self, item):
+        if not self["enableScrollWheel"]:
+            return False
+
+        if item.isUnbound(DGG.MWUP) and item.isUnbound(DGG.MWDOWN):
+            item.bind(DGG.MWUP, self._scroll, extraArgs=[-1])
+            item.bind(DGG.MWDOWN, self._scroll, extraArgs=[1])
+            return True
+
+        return False
+
+    def _scroll(self, step, _):
+        speed = 5
+        if base.mouseWatcherNode.is_button_down(self["horizontalScrollKey"]):
+            direction = "h"
+        else:
+            direction = "v"
+        self.scrollStep(direction, step * speed)
+
+    def enableScroll(self):
+        element_list = [
+            self,
+            self.verticalScroll,
+            self.verticalScroll.thumb,
+            # self.verticalScroll.incButton,
+            # self.verticalScroll.decButton,
+            self.horizontalScroll,
+            self.horizontalScroll.thumb,
+            # self.horizontalScroll.incButton,
+            # self.horizontalScroll.decButton,
+        ]
+
+        if self["enableScrollWheel"]:
+            for node in element_list:
+                node.bind(DGG.MWUP, self._scroll, extraArgs=[-1])
+                node.bind(DGG.MWDOWN, self._scroll, extraArgs=[1])
+
+        else:
+            for node in element_list:
+                node.unbind(DGG.MWUP)
+                node.unbind(DGG.MWDOWN)
+
+    def addItem(self, item):
+        item.reparentTo(self.canvas)
+        self.setup_scroll_bind(item)
 
     def setScrollBarWidth(self):
         if self.fInit: return

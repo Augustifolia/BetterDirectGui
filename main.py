@@ -1,7 +1,15 @@
 """Showcase and entrypoint for tests."""
+from panda3d.core import loadPrcFileData
 from direct.showbase.ShowBase import ShowBase
 import BetterDirectGui
 from direct.gui import DirectGuiGlobals as DGG
+
+loadPrcFileData(
+    "",
+    """
+    want-pstats  #f
+    win-size 1280 720
+    """)
 
 
 def test_most_types():
@@ -26,11 +34,16 @@ def test_inverted_scrollbar():
     from tests.inverted_scrollbars import GUI
     GUI()
 
+def test_scroll():
+    from tests.scroll_test import GUI
+    GUI()
+
 
 if __name__ == '__main__':
     base = ShowBase()  # init ShowBase
+    base.setFrameRateMeter(True)
     base.accept("escape", base.userExit)
-    BetterDirectGui.init()  # init BetterDirectGui after ShowBase
+    BetterDirectGui.init(do_keyboard_navigation=False)  # init BetterDirectGui after ShowBase
 
     # create some gui
     run_test = 0
@@ -50,6 +63,8 @@ if __name__ == '__main__':
         test_inverted_scrollbar()
     elif run_test == 5:
         pass  # test empty scene
+    elif run_test == 6:
+        test_scroll()
 
     if do_theme == 1:
         # This looks terrible, but it illustrates how one easily can create a theme
@@ -57,16 +72,13 @@ if __name__ == '__main__':
             "general": dict(
                 text_shadow=(.6, .6, .6, 1),
                 text_shadowOffset=(0.05, 0.05),
-                relief=DGG.FLAT,
-                frameTexture="models/maps/circle.png",
-                # frameTexture="BetterDirectGui/BDGAssets/corner.png",
+                relief=DGG.TEXTUREBORDER,
+                # relief=None,
+                # frameTexture="models/maps/circle.png",
+                frameTexture="assets/border.png",
+                borderUvWidth=(.15, .15),
                 transparency=True,
-                frameColor=(.1, .67, .3, 1),
-                # compositeFrameTexture=dict(
-                #     edge="BetterDirectGui/BDGAssets/edge.png",
-                #     corner="BetterDirectGui/BDGAssets/corner.png",
-                #     center="BetterDirectGui/BDGAssets/center.png",
-                # )
+                frameColor=(.4, .7, .4, 1),
             ),
             "DirectButton": dict(
                 frameColor=(0.1, 1, 1, 1),
@@ -77,24 +89,40 @@ if __name__ == '__main__':
             ),
             "DirectCheckButton": dict(
                 indicatorValue=1,
+                boxRelief=DGG.TEXTUREBORDER,
+                # indicator_borderWidth=(.2, .2)
             ),
             "OkDialog": dict(
                 # buttonTextList=["Ok", "No"],
                 # buttonValueList=[DGG.DIALOG_OK, DGG.DIALOG_NO]
+                borderWidth=(.1, .1),
+                button_borderWidth=(.1, .1),
+                button_relief=DGG.TEXTUREBORDER
             ),
             "DirectScrollBar": dict(
                 # relief=DGG.SUNKEN,
                 # borderWidth=(0.01, 0.01),
-                thumb_frameColor=(1, 1, .1, 1)
+                # thumb_frameColor=(1, 1, .1, 1)
             ),
             "DirectScrolledFrame": dict(
-                scrollBarWidth=0.03
+                scrollBarWidth=0.03,
+                borderWidth=(.1, .1),
+                verticalScroll_thumb_frameColor=[1, .1, 1, 1]
             ),
             "DirectOptionMenu": dict(
                 cancelframe_frameColor=(0, 0, 0, 0)
             ),
             "DirectScrolledList": dict(
-                itemFrame_frameColor=(1, 1, 1, 1)
+                itemFrame_frameColor=(1, 1, 1, 1),
+                # items_relief=DGG.TEXTUREBORDER
+            ),
+            "DirectWaitBar": dict(
+                borderWidth=(.1, .1),
+                # barTexture="models/maps/circle.png"
+            ),
+            "DirectRadioButton": dict(
+                boxRelief=DGG.TEXTUREBORDER,
+                boxBorder=.1
             )
         }
         base.gui_controller.set_theme(theme)
@@ -103,3 +131,13 @@ if __name__ == '__main__':
 
     # start application
     base.run()
+
+# layout = dict(
+#     some_widget=dict(
+#         theme="some_theme",
+#         children=dict(
+#             button={},
+#             button={},
+#         )
+#     ),
+# )

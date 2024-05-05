@@ -286,6 +286,9 @@ class GuiController(DirectObject):
         # print("current_selection", value)
 
     def _highlight(self, gui: DirectGuiBase.DirectGuiWidget):
+        if not self.do_keyboard_navigation:
+            return
+
         if not self._do_highlight:
             return
 

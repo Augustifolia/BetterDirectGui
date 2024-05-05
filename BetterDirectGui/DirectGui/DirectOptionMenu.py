@@ -323,11 +323,15 @@ class DirectOptionMenu(DirectButton):
     def _hide_popup_menu_cancel_frame(self, event=None):
         self.hidePopupMenu()
         if event is not None:
+            base.gui_controller._do_highlight = False
             base.gui_controller._activate()
+            base.gui_controller._do_highlight = True
 
     def _highlightItem(self, item, index):
         """ Set frame color of highlighted item, record index """
         self._prevItemTextScale = item['text_scale']
+        if base.gui_controller.do_bug_fixes:
+            self._prevItemFrameColor = item["frameColor"]
         item['frameColor'] = self['highlightColor']
         item['frameSize'] = (self['highlightScale'][0]*self.minX, self['highlightScale'][0]*self.maxX, self['highlightScale'][1]*self.minZ, self['highlightScale'][1]*self.maxZ)
         item['text_scale'] = self['highlightScale']
@@ -335,7 +339,10 @@ class DirectOptionMenu(DirectButton):
 
     def _unhighlightItem(self, item, frameColor):
         """ Clear frame color, clear highlightedIndex """
-        item['frameColor'] = frameColor
+        if base.gui_controller.do_bug_fixes:
+            item["frameColor"] = self._prevItemFrameColor
+        else:
+            item['frameColor'] = frameColor
         item['frameSize'] = (self.minX, self.maxX, self.minZ, self.maxZ)
         item['text_scale'] = self._prevItemTextScale
         self.highlightedIndex = None

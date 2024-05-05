@@ -65,6 +65,8 @@ class GUI:
             checkedImage="models/maps/envir-bamboo.png",
             # isChecked=True
         )
+        # print(type(self.pg2627.component("image0")))
+        # print(self.pg2627.components())
         self.pg2627["uncheckedImage"] = "models/maps/envir-bamboo.png"
         self.pg2627["checkedImage"] = "models/maps/circle.png"
         self.pg2627.setTransparency(0)
@@ -135,6 +137,8 @@ class GUI:
             parent=rootParent,
         )
         self.pg11012.setTransparency(0)
+        # self.pg11012.thumb["frameColor"] = [.1, 1, 1, 1]
+        # self.pg11012["thumb_frameColor"] = [.1, 1, 1, 1]
 
         self.pg12261 = DirectLabel(
             pos = LPoint3f(0.35, 0, 0.075),
@@ -150,6 +154,7 @@ class GUI:
             text = '0%',
             text0_scale = (0.1, 0.1),
             parent=rootParent,
+            value=40
         )
         self.pg12869.setTransparency(0)
 
@@ -169,6 +174,9 @@ class GUI:
             parent=rootParent,
         )
         self.pg14617.setTransparency(0)
+        # self.pg14617["verticalScroll_thumb_frameColor"] = [.1, .1, 1, 1]
+        self.pg14617.verticalScroll["thumb_frameColor"] = [.1, .1, 1, 1]
+        # self.pg14617.verticalScroll.thumb["frameColor"] = [.1, .1, 1, 1]
 
         self.pg16851 = DirectScrolledList(
             state = 'normal',
@@ -221,26 +229,28 @@ class GUI:
         self.pg16851.addItem(l5)
         self.pg16851.addItem(l6)
         self.pg16851["itemsWordwrap"] = 4
-        self.pg16851["itemsAlign"] = TextNode.ARight
+        # self.pg16851["itemsAlign"] = TextNode.ARight
 
         self.pg18888 = OkDialog(
             state = 'normal',
             pos = LPoint3f(0.9, 0.1, 0.675),
             text = 'Ok Dialog',
             parent=rootParent,
-            buttonTextList=["b1"],
+            # buttonTextList=["b1"],
             buttonSize=(-.1, .1, -.1, .1),
             # fadeScreen=0.5,
+            button_relief=DGG.TEXTUREBORDER,
+            scale=0.7,
         )
         self.pg18888.setTransparency(0)
-        self.pg18888["topPad"] = 0.4
-        self.pg18888["sidePad"] = 0.1
-        self.pg18888["midPad"] = 0.1
-        self.pg18888["buttonPadSF"] = 1.1
-        self.pg18888["buttonSize"] = (-.1, .1, -.1, .1)
-        self.pg18888["buttonTextList"] = ["b1", "b2", "b3"]
-        self.pg18888["fadeScreen"] = 0.4
-        self.pg18888["fadeScreen"] = 0
+        # self.pg18888["topPad"] = 0.4
+        # self.pg18888["sidePad"] = 0.1
+        # self.pg18888["midPad"] = 0.1
+        # self.pg18888["buttonPadSF"] = 1.1
+        # self.pg18888["buttonSize"] = (-.1, .1, -.1, .1)
+        # self.pg18888["buttonTextList"] = ["b1", "b2", "b3"]
+        # self.pg18888["fadeScreen"] = 0.4
+        # self.pg18888["fadeScreen"] = 0
 
     def show(self):
         self.pg196.show()

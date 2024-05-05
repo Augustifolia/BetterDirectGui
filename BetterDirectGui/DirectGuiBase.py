@@ -15,6 +15,9 @@ if TYPE_CHECKING:
 
 __all__ = ["DirectGuiWidget"]
 
+DGG.MWUP = p3d.PGButton.getPressPrefix() + p3d.MouseButton.wheel_up().getName() + '-'
+DGG.MWDOWN = p3d.PGButton.getPressPrefix() + p3d.MouseButton.wheel_down().getName() + '-'
+
 
 class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
     """Subclass of DirectGuiWidget with keyboard navigation support."""
@@ -76,11 +79,45 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
         # Call option initialization functions
         self.initialiseoptions(DirectGuiWidget)
 
+        # If this is parented to some scrolled frame, make sure that can be scrolled
+        self._is_child_of_scrolled_frame = False
+        self._handle_parent_scrolling()
+
         # make sure to update stuff for keyboard navigation when self is pressed with the mouse.
         self.bind(DGG.B1PRESS, self._set_active)
 
         # Apply the theme to self
         self.add_theming_options(kw, parent, DirectGuiWidget)
+
+    def _handle_parent_scrolling(self):
+        if self._is_child_of_scrolled_frame:
+            self.unbind(DGG.MWUP)
+            self.unbind(DGG.MWDOWN)
+            self._is_child_of_scrolled_frame = False
+
+        ancestors = self.getAncestors()
+        for ancestor in ancestors:
+            if ancestor.name == "canvas":
+                node = ancestor.parent.parent
+                name = node.name.split("-")[-1]
+                try:
+                    self._is_child_of_scrolled_frame = self.guiDict[name].setup_scroll_bind(self)
+                except AttributeError:
+                    pass
+
+                break
+
+    def reparentTo(self, *args, **kwargs):
+        super().reparentTo(*args, **kwargs)
+        self._handle_parent_scrolling()
+
+    reparent_to = reparentTo
+
+    def wrtReparentTo(self, *args, **kwargs):
+        super().wrtReparentTo(*args, **kwargs)
+        self._handle_parent_scrolling()
+
+    wrt_reparent_to = wrtReparentTo
 
     def _set_pos(self):
         if self['pos']:
@@ -181,6 +218,7 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
         self._theme = theme
         self._apply_theme()
 
+    # todo save "_kw" and "_dont_edit" in the object that actually has the option (might require onscreenText to actually support themability directly)
     def _apply_theme(self):
         theme = self._theme
         priority = self._theme_priority
@@ -202,16 +240,16 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
             if key in self._kw:  # make sure to not override value set by user
                 value = self._kw[key]
 
-            if key in self._dont_edit:  # some ancestor has already handled this value
+            elif key in self._dont_edit:  # some ancestor has already handled this value
                 self._dont_edit.remove(key)
                 continue
 
-            self.configure(**{key: value})
             if "_" in key:  # the option is for some component
                 index = key.rfind("_")
                 comp_name = key[:index]
                 if not self.hascomponent(comp_name):  # for example "text" is not a component, but "text0" is
-                    comp_name += "0"
+                    # comp_name += "0"
+                    pass
                 try:
                     comp = self.component(comp_name)
                 except KeyError as e:
@@ -219,8 +257,13 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
                         raise e  # this is a bug, throw the error again
                 else:
                     option_name = key[index + 1:]
+                    # if hasattr(comp, "_kw") and option_name in comp._kw:
+                    #     value = comp._kw[option_name]
                     if hasattr(comp, "_dont_edit"):  # OnscreenText/Image/Geom does not have that
+                        # this makes sure thumb_frameColor takes precedence over frameColor in a theme
                         comp._dont_edit.add(option_name)  # make sure the component doesn't override the value just set
+
+            self.configure(**{key: value})
 
         children = base.gui_controller._get_gui_children(self)
         for child in children:  # propagate the theme to the children
@@ -331,6 +374,18 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
         if event == DGG.B1PRESS:  # Make sure _set_active is still bound
             self.bind(DGG.B1PRESS, self._set_active)
 
+    def isBound(self, event):
+        gEvent = event + self.guiId
+        return self.isAccepting(gEvent)
+
+    is_bound = isBound
+
+    def isUnbound(self, event):
+        gEvent = event + self.guiId
+        return self.isIgnoring(gEvent)
+
+    is_unbound = isUnbound
+
     def _set_active(self, event, skip_activate=True):
         if not base.gui_controller.do_keyboard_navigation:
             return
@@ -428,6 +483,9 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
     def highlight(self):
         """Method to be called when element is the "current_selection"
         (not selected, just the current node for the GuiController) to highlight it."""
+        if not base.gui_controller.do_keyboard_navigation:
+            return
+
         if not base.gui_controller._do_highlight:
             return
 
