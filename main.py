@@ -65,6 +65,8 @@ if __name__ == '__main__':
         pass  # test empty scene
     elif run_test == 6:
         test_scroll()
+    elif run_test == 7:
+        import tests.draggable_tile_test
 
     if do_theme == 1:
         # This looks terrible, but it illustrates how one easily can create a theme
