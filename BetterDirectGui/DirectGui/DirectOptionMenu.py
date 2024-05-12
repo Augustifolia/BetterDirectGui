@@ -26,7 +26,7 @@ class DirectOptionMenu(DirectButton):
         # Inherits from DirectButton
         optiondefs = (
             # List of items to display on the popup menu
-            ('items',       [],             self.setItems),
+            ('items',       ["XXX"],             self.setItems),
             # Initial item to display on menu button
             # Can be an integer index or the same string as the button
             ('initialitem', None,           DGG.INITOPT),
@@ -114,6 +114,14 @@ class DirectOptionMenu(DirectButton):
         self.initialiseoptions(DirectOptionMenu)
         # Need to call this since we explicitly set frame size
         self.resetFrameSize()
+
+        # Make sure the gui still works even if no item was submitted at init time
+        if "items" not in kw:
+            self["items"] = []
+            self.showPopupMenu()
+            self.hidePopupMenu()
+            self["text"] = kw["text"] if "text" in kw else " "
+
         # Apply the theme to self
         self.add_theming_options(kw, parent, DirectOptionMenu)
 
@@ -270,11 +278,12 @@ class DirectOptionMenu(DirectButton):
         Adjust popup position if default position puts it outside of
         visible screen region
         """
-
         # Needed attributes (such as minZ) won't be set unless the user has specified
         # items to display. Let's assert that we've given items to work with.
         items = self['items']
-        assert items and len(items) > 0, 'Cannot show an empty popup menu! You must add items!'
+
+        if base.gui_controller.default_option_menu:
+            assert items and len(items) > 0, 'Cannot show an empty popup menu! You must add items!'
 
         # Show the menu
         self.popupMenu.show()
@@ -283,12 +292,18 @@ class DirectOptionMenu(DirectButton):
         # Compute bounds
         b = self.getBounds()
         fb = self.popupMenu.getBounds()
-        # Position menu at midpoint of button
-        xPos = (b[1] - b[0])/2.0 - fb[0]
-        self.popupMenu.setX(self, xPos)
-        # Try to set height to line up selected item with button
-        self.popupMenu.setZ(
-            self, self.minZ + (self.selectedIndex + 1)*self.maxHeight)
+
+        if base.gui_controller.default_option_menu:
+            # Position menu at midpoint of button
+            xPos = (b[1] - b[0])/2.0 - fb[0]
+            self.popupMenu.setX(self, xPos)
+            # Try to set height to line up selected item with button
+            self.popupMenu.setZ(
+                self, self.minZ + (self.selectedIndex + 1)*self.maxHeight)
+        else:
+            # Position the popup menu underneath the button
+            self.popupMenu.setPos(self, self.minX, 0, self.minZ)
+
         # Make sure the whole popup menu is visible
         pos = self.popupMenu.getPos(ShowBaseGlobal.render2d)
         scale = self.popupMenu.getScale(ShowBaseGlobal.render2d)
@@ -316,9 +331,10 @@ class DirectOptionMenu(DirectButton):
         """ Put away popup and cancel frame """
         self.popupMenu.hide()
         self.cancelFrame.hide()
-        self.ignore_keyboard_navigation()
-        if not self.fInit and not skip_key_handling:
-            base.gui_controller.current_selection = self
+        if base.gui_controller.do_keyboard_navigation:
+            self.ignore_keyboard_navigation()
+            if not self.fInit and not skip_key_handling:
+                base.gui_controller.current_selection = self
 
     def _hide_popup_menu_cancel_frame(self, event=None):
         self.hidePopupMenu()

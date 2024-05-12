@@ -90,6 +90,8 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
         self.add_theming_options(kw, parent, DirectGuiWidget)
 
     def _handle_parent_scrolling(self):
+        # Make sure that children of DirectScrolledFrames get bound to scroll events
+        # to make sure scrolling works properly
         if self._is_child_of_scrolled_frame:
             self.unbind(DGG.MWUP)
             self.unbind(DGG.MWDOWN)
@@ -107,6 +109,7 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
 
                 break
 
+    # is needed to make sure scrolling is updated in all directScrolledFrames
     def reparentTo(self, *args, **kwargs):
         super().reparentTo(*args, **kwargs)
         self._handle_parent_scrolling()

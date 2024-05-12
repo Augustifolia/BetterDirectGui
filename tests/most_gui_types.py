@@ -29,13 +29,13 @@ class GUI:
             command=test
         )
         self.pg196.setTransparency(0)
-        self.pg196["pressEffect"] = 1
-        self.pg196["pressEffect"] = 0
 
         self.pg1363 = DirectEntry(
-            pos = LPoint3f(-0.85, 0, 0.65),
+            pos = LPoint3f(-0.85, 0, 0.85),
             scale = LVecBase3f(0.1, 0.1, 0.1),
             parent=rootParent,
+            overflow=1,
+            enteredText="hello",
         )
         self.pg1363.setTransparency(0)
 

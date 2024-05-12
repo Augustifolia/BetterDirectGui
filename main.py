@@ -69,14 +69,12 @@ if __name__ == '__main__':
         import tests.draggable_tile_test
 
     if do_theme == 1:
-        # This looks terrible, but it illustrates how one easily can create a theme
+        # This isn't made to look good, but it illustrates how one easily can create a theme
         theme = {
             "general": dict(
                 text_shadow=(.6, .6, .6, 1),
                 text_shadowOffset=(0.05, 0.05),
                 relief=DGG.TEXTUREBORDER,
-                # relief=None,
-                # frameTexture="models/maps/circle.png",
                 frameTexture="assets/border.png",
                 borderUvWidth=(.15, .15),
                 transparency=True,
@@ -87,7 +85,9 @@ if __name__ == '__main__':
                 text_shadow=(.4, .4, .7, 1),
             ),
             "DirectEntry": dict(
-                enteredText="initial text"
+                # enteredText="initial text",
+                # numLines=3,
+                # overflow=1,
             ),
             "DirectCheckButton": dict(
                 indicatorValue=1,
@@ -102,13 +102,13 @@ if __name__ == '__main__':
                 button_relief=DGG.TEXTUREBORDER
             ),
             "DirectScrollBar": dict(
-                # relief=DGG.SUNKEN,
                 # borderWidth=(0.01, 0.01),
                 # thumb_frameColor=(1, 1, .1, 1)
             ),
             "DirectScrolledFrame": dict(
                 scrollBarWidth=0.03,
-                borderWidth=(.1, .1),
+                borderWidth=(.03, .03),
+                borderUvWidth=(.08, .08),
                 verticalScroll_thumb_frameColor=[1, .1, 1, 1]
             ),
             "DirectOptionMenu": dict(
@@ -120,12 +120,14 @@ if __name__ == '__main__':
             ),
             "DirectWaitBar": dict(
                 borderWidth=(.1, .1),
-                # barTexture="models/maps/circle.png"
             ),
             "DirectRadioButton": dict(
                 boxRelief=DGG.TEXTUREBORDER,
                 boxBorder=.1
-            )
+            ),
+            "DraggableTile": dict(
+                borderWidth=(.05, .05),
+            ),
         }
         base.gui_controller.set_theme(theme)
         # base.gui_controller.clear_theme()
@@ -133,13 +135,3 @@ if __name__ == '__main__':
 
     # start application
     base.run()
-
-# layout = dict(
-#     some_widget=dict(
-#         theme="some_theme",
-#         children=dict(
-#             button={},
-#             button={},
-#         )
-#     ),
-# )

@@ -30,13 +30,19 @@ class GuiController(DirectObject):
     gui_themes = None  # By default, no theme
     gui_theme_priority = -1
 
-    def __init__(self, base_np: p3d.NodePath = None, respect_sortOrder=False,
-                 do_bug_fixes=True, theme=None, do_keyboard_navigation=True, no_initopts=True):
+    def __init__(self, base_np: p3d.NodePath = None,
+                 respect_sortOrder=False,
+                 do_bug_fixes=True,
+                 theme=None,
+                 do_keyboard_navigation=True,
+                 no_initopts=True,
+                 default_option_menu=False):
         super().__init__()
         base.gui_controller = self
         self._respect_sortOrder = respect_sortOrder
         self._guiItems = DirectGuiBase.DirectGuiWidget.guiDict
         self._do_bug_fixes = do_bug_fixes
+        self._default_option_menu = default_option_menu
         self._do_theming = True
         self._no_initopts = no_initopts
         if base_np is None:
@@ -94,6 +100,11 @@ class GuiController(DirectObject):
         children = self._get_gui_children(self._base_np)
         for child in children:
             child.clear_theme()
+
+    @property
+    def default_option_menu(self):
+        """Does DirectOptionMenus have their default appearance?"""
+        return self._default_option_menu
 
     @property
     def key_map(self):

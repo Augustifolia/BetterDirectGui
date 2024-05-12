@@ -60,8 +60,25 @@ class DraggableTile(DirectButton):
         if item is None:
             return
 
-        item.reparentTo(self)
-        item.setPos(item["placementOffset"][0], 0, item["placementOffset"][1])
+        item.wrt_reparent_to(self)
+        frameSize = None
+        if item["frameSize"]:
+            frameSize = item["frameSize"]
+        else:
+            frameSize = item.bounds
+
+        if frameSize is None:
+            frameSize = (0, ) * 4
+
+        height = frameSize[3] - frameSize[2]
+        center_z = height/2 + frameSize[2]
+        width = frameSize[1] - frameSize[0]
+        center_x = width/2 + frameSize[0]
+        item.setPos(
+            item["placementOffset"][0] - item.getScale().x * center_x,
+            0,
+            item["placementOffset"][1] - item.getScale().z * center_z
+        )
 
 
 class DraggableItem(DirectButton):
@@ -71,7 +88,7 @@ class DraggableItem(DirectButton):
     Make sure that you add your Item to a Tile by using:
         yourTile["content"] = yourItem
 
-    Use 'placementOffset' to position the Item in its' Tile.
+    Use 'placementOffset' to adjust the Item position in its' Tile. It should automatically be centered.
 
     Only Tiles and Items with the same 'group' number interact with each other.
     If you add some child widget to this item,
@@ -98,6 +115,7 @@ class DraggableItem(DirectButton):
         # Set up some stuff for drag and drop
         self._is_dragged = False
         self._old_parent = None
+        self._task = None
         self.bind(DGG.B1PRESS, self._grab)
         self.bind(DGG.B1RELEASE, self._release)
 
@@ -112,8 +130,8 @@ class DraggableItem(DirectButton):
         self._old_parent = base.gui_controller._get_gui(self.parent)
         assert self._old_parent is not None, f"{self} has an invalid parent node. It should be parented to a 'DraggableTile'"
 
-        self.reparentTo(base.aspect2d)
-        self.addTask(self._drag_task, "drag")
+        self.wrt_reparent_to(base.aspect2d)
+        self._task = self.addTask(self._drag_task, "drag")
 
     def _release(self, _):
         if not self._is_dragged:
@@ -125,7 +143,7 @@ class DraggableItem(DirectButton):
         if new_parent is not None and new_parent["group"] != self["group"]:
             new_parent = None
 
-        self.removeTask("drag")
+        self.removeTask(self._task)
         self.setPos(self["placementOffset"][0], 0, self["placementOffset"][1])
 
         if new_parent is None:

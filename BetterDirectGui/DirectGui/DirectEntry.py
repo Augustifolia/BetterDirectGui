@@ -158,6 +158,9 @@ class DirectEntry(DirectFrame):
         if self['initialText']:
             self.enterText(self['initialText'])
 
+        # update enteredText
+        self._enteredText()
+
         # Apply the theme to self
         self.add_theming_options(kw, parent, DirectEntry)
 
@@ -195,6 +198,8 @@ class DirectEntry(DirectFrame):
 
     def updateNumLines(self):
         self.guiItem.setNumLines(self['numLines'])
+        self.resetFrameSize()
+        self["enteredText"] = self["enteredText"]
 
     def setFocus(self):
         PGEntry.setFocus(self.guiItem, self['focus'])
@@ -203,7 +208,11 @@ class DirectEntry(DirectFrame):
         PGEntry.setCursorKeysActive(self.guiItem, self['cursorKeys'])
 
     def setOverflowMode(self):
+        text = self["enteredText"]
+        self["enteredText"] = ""
         PGEntry.set_overflow_mode(self.guiItem, self['overflow'])
+        self.setup()
+        self["enteredText"] = text
 
     def setObscureMode(self):
         PGEntry.setObscureMode(self.guiItem, self['obscured'])

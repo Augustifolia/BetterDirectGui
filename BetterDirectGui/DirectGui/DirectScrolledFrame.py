@@ -110,8 +110,13 @@ class DirectScrolledFrame(DirectFrame):
         speed = 5
         if base.mouseWatcherNode.is_button_down(self["horizontalScrollKey"]):
             direction = "h"
+            if self.horizontalScroll.isHidden():
+                return
         else:
             direction = "v"
+            if self.verticalScroll.isHidden():
+                return
+
         self.scrollStep(direction, step * speed)
 
     def enableScroll(self):
