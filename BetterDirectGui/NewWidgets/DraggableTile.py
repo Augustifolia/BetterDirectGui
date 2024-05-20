@@ -24,6 +24,7 @@ class DraggableTile(DirectButton):
             ('content',         None,       self._addItem),
             ('selectable',      False,      None),
             ('frameSize', [-.1, .1, -.1, .1], None),
+            ('borderWidth', (.02, .02),       None),
         )
 
         # Merge keyword options with default options
@@ -61,23 +62,11 @@ class DraggableTile(DirectButton):
             return
 
         item.wrt_reparent_to(self)
-        frameSize = None
-        if item["frameSize"]:
-            frameSize = item["frameSize"]
-        else:
-            frameSize = item.bounds
-
-        if frameSize is None:
-            frameSize = (0, ) * 4
-
-        height = frameSize[3] - frameSize[2]
-        center_z = height/2 + frameSize[2]
-        width = frameSize[1] - frameSize[0]
-        center_x = width/2 + frameSize[0]
+        center_x, center_z = item.getCenterPosition()
         item.setPos(
-            item["placementOffset"][0] - item.getScale().x * center_x,
+            item["placementOffset"][0] - center_x,
             0,
-            item["placementOffset"][1] - item.getScale().z * center_z
+            item["placementOffset"][1] - center_z
         )
 
 
@@ -122,6 +111,24 @@ class DraggableItem(DirectButton):
         # Apply the theme to self
         self.add_theming_options(kw, parent, DraggableItem)
 
+    def getCenterPosition(self) -> tuple[float, float]:
+        """Method to get the center position of the self."""
+        frameSize = None
+        if self["frameSize"]:
+            frameSize = self["frameSize"]
+        else:
+            frameSize = self.bounds
+
+        if frameSize is None:
+            frameSize = (0,) * 4
+
+        height = frameSize[3] - frameSize[2]
+        center_z = (height / 2 + frameSize[2]) * self.getScale().z
+        width = frameSize[1] - frameSize[0]
+        center_x = (width / 2 + frameSize[0]) * self.getScale().x
+
+        return center_x, center_z
+
     def _grab(self, _):
         if self._is_dragged:
             return
@@ -163,5 +170,6 @@ class DraggableItem(DirectButton):
         else:
             return task.cont
 
-        self.setPos(base.render2d, x, 0, y)
+        center_x, center_y = self.getCenterPosition()
+        self.setPos(base.render2d, x - center_x, 0, y - center_y)
         return task.cont

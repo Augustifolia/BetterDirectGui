@@ -92,7 +92,9 @@ if __name__ == '__main__':
             "DirectCheckButton": dict(
                 indicatorValue=1,
                 boxRelief=DGG.TEXTUREBORDER,
-                # indicator_borderWidth=(.2, .2)
+                # indicator_borderWidth=(.2, .2),
+                boxBorder=.1,
+                indicator_borderUvWidth=(.1, .1),
             ),
             "OkDialog": dict(
                 # buttonTextList=["Ok", "No"],
@@ -123,7 +125,9 @@ if __name__ == '__main__':
             ),
             "DirectRadioButton": dict(
                 boxRelief=DGG.TEXTUREBORDER,
-                boxBorder=.1
+                boxBorder=.1,
+                # boxPlacement="right",
+                indicator_borderUvWidth=(.1, .1),
             ),
             "DraggableTile": dict(
                 borderWidth=(.05, .05),

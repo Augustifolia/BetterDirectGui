@@ -296,7 +296,9 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
                 index = key.rfind("_")
                 comp_name = key[:index]
 
-                if not self.hascomponent(comp_name):  # for example "text" is not a component, but "text0" is
+                try:  # check if component can be found (this includes subcomponents)
+                    comp = self.component(comp_name)
+                except KeyError:  # otherwise try appending "0" to the name, needed for stuff like 'text' components
                     comp_name += "0"
 
                 try:

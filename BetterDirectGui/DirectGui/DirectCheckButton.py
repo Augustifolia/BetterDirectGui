@@ -180,33 +180,32 @@ class DirectCheckButton(DirectButton):
             ibw = self.indicator['borderWidth']
             indicatorWidth = (self.indicator.getWidth() + (2*ibw[0]))
             indicatorHeight = (self.indicator.getHeight() + (2*ibw[1]))
-            diff = (indicatorHeight + (2*self['boxBorder']) -
-                    (self.bounds[3] - self.bounds[2]))
-            # If background is smaller then indicator, enlarge background
-            if diff > 0:
-                if self['boxPlacement'] == 'left':            #left
-                    self.bounds[0] += -(indicatorWidth + (2*self['boxBorder']))
-                    self.bounds[3] += diff/2
-                    self.bounds[2] -= diff/2
-                elif self['boxPlacement'] == 'below':          #below
-                    self.bounds[2] += -(indicatorHeight+(2*self['boxBorder']))
-                elif self['boxPlacement'] == 'right':          #right
-                    self.bounds[1] += indicatorWidth + (2*self['boxBorder'])
-                    self.bounds[3] += diff/2
-                    self.bounds[2] -= diff/2
-                else:                                    #above
-                    self.bounds[3] += indicatorHeight + (2*self['boxBorder'])
+            diff_y = (indicatorHeight + (2 * self['boxBorder']) -
+                      (self.bounds[3] - self.bounds[2]))
 
-            # Else make space on correct side for indicator
+            # check size in x direction to fit the indicator
+            if "text0" in self.components():
+                text = self.component("text0")
+                text_bounds = text.getTightBounds()
             else:
-                if self['boxPlacement'] == 'left':            #left
-                    self.bounds[0] += -(indicatorWidth + (2*self['boxBorder']))
-                elif self['boxPlacement'] == 'below':          #below
-                    self.bounds[2] += -(indicatorHeight + (2*self['boxBorder']))
-                elif self['boxPlacement'] == 'right':          #right
-                    self.bounds[1] += indicatorWidth + (2*self['boxBorder'])
-                else:                                    #above
-                    self.bounds[3] += indicatorHeight + (2*self['boxBorder'])
+                text_bounds = (Vec3(0), Vec3(0))
+            text_width = text_bounds[1].x - text_bounds[0].x
+            space_left = (self.bounds[1] - self.bounds[0]) - text_width - 2 * self["borderWidth"][0]
+            diff_x = indicatorWidth + 2 * self['boxBorder'] - space_left
+
+            # If background is smaller then indicator, enlarge background
+            if self['boxPlacement'] == 'left':  # left
+                self.bounds[0] += -diff_x
+                self.bounds[3] += diff_y / 2
+                self.bounds[2] -= diff_y / 2
+            elif self['boxPlacement'] == 'below':  # below
+                self.bounds[2] += -(indicatorHeight + (2 * self['boxBorder']))
+            elif self['boxPlacement'] == 'right':  # right
+                self.bounds[1] += diff_x
+                self.bounds[3] += diff_y / 2
+                self.bounds[2] -= diff_y / 2
+            else:  # above
+                self.bounds[3] += indicatorHeight + (2 * self['boxBorder'])
 
         # Set frame to new dimensions
         if ((frameType != PGFrameStyle.TNone) and
