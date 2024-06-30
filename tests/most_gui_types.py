@@ -28,7 +28,6 @@ class GUI:
             pressEffect=1,
             command=test
         )
-        self.pg196.setTransparency(0)
 
         self.pg1363 = DirectEntry(
             pos = LPoint3f(-0.85, 0, 0.85),
@@ -37,7 +36,6 @@ class GUI:
             overflow=1,
             enteredText="hello",
         )
-        self.pg1363.setTransparency(0)
 
         self.pg2152 = DirectEntry(
             # parent=self.pg2153,
@@ -48,13 +46,11 @@ class GUI:
         # print(self.pg2152["enteredText"])
         self.pg2152.set("other")
         # print(self.pg2152["enteredText"])
-        self.pg2152.setTransparency(0)
         self.pg2153 = DirectEntryScroll(
             parent=rootParent,
             scale=LVecBase3f(0.1, 0.1, 0.1),
             entry=self.pg2152,
         )
-        self.pg2153.setTransparency(0)
         self.pg2152.reparentTo(self.pg2153)
 
         self.pg2627 = DirectCheckBox(
@@ -69,7 +65,6 @@ class GUI:
         # print(self.pg2627.components())
         self.pg2627["uncheckedImage"] = "models/maps/envir-bamboo.png"
         self.pg2627["checkedImage"] = "models/maps/circle.png"
-        self.pg2627.setTransparency(0)
         self.pg2627["pressEffect"] = 1
         self.pg2627["isChecked"] = True
 
@@ -100,7 +95,6 @@ class GUI:
             parent=rootParent,
             items=["button1", "button2", "button3"]
         )
-        self.pg5339.setTransparency(0)
         self.pg5339["selectedItem"] = "button2"
         # print(self.pg5339["selectedItem"])
         self.pg5339["pressEffect"] = 1
@@ -117,7 +111,6 @@ class GUI:
             value=[],
             # boxImage="models/maps/circle.png"
         )
-        self.pg8076.setTransparency(0)
         # self.pg8076["boxBorder"] = .3
         # self.pg8076["boxPlacement"] = "right"
         # self.pg8076["boxImage"] = None
@@ -130,13 +123,11 @@ class GUI:
             text0_scale = (0.1, 0.1),
             parent=rootParent,
         )
-        self.pg9880.setTransparency(0)
 
         self.pg11012 = DirectScrollBar(
             pos = LPoint3f(-0.45, 0, 0.05),
             parent=rootParent,
         )
-        self.pg11012.setTransparency(0)
         # self.pg11012.thumb["frameColor"] = [.1, 1, 1, 1]
         # self.pg11012["thumb_frameColor"] = [.1, 1, 1, 1]
 
@@ -146,7 +137,6 @@ class GUI:
             text = 'Label',
             parent=rootParent,
         )
-        self.pg12261.setTransparency(0)
 
         self.pg12869 = DirectWaitBar(
             state = 'normal',
@@ -156,7 +146,6 @@ class GUI:
             parent=rootParent,
             value=40
         )
-        self.pg12869.setTransparency(0)
 
         self.pg13530 = DirectFrame(
             frameSize = (-0.2, 0.2, -0.2, 0.2),
@@ -164,7 +153,6 @@ class GUI:
             pos = LPoint3f(-1, 0, -0.45),
             parent=rootParent,
         )
-        self.pg13530.setTransparency(0)
 
         self.pg14617 = DirectScrolledFrame(
             state = 'normal',
@@ -173,7 +161,6 @@ class GUI:
             pos = LPoint3f(-0.5, 0, -0.45),
             parent=rootParent,
         )
-        self.pg14617.setTransparency(0)
         # self.pg14617["verticalScroll_thumb_frameColor"] = [.1, .1, 1, 1]
         self.pg14617.verticalScroll["thumb_frameColor"] = [.1, .1, 1, 1]
         # self.pg14617.verticalScroll.thumb["frameColor"] = [.1, .1, 1, 1]
@@ -213,7 +200,6 @@ class GUI:
             text0_scale = (0.1, 0.1),
             parent=rootParent,
         )
-        self.pg16851.setTransparency(0)
 
         l1 = DirectLabel(text="Test1", text_scale=0.1)
         l2 = DirectLabel(text="Test2", text_scale=0.1)
@@ -242,7 +228,6 @@ class GUI:
             button_relief=DGG.TEXTUREBORDER,
             scale=0.7,
         )
-        self.pg18888.setTransparency(0)
         # self.pg18888["topPad"] = 0.4
         # self.pg18888["sidePad"] = 0.1
         # self.pg18888["midPad"] = 0.1

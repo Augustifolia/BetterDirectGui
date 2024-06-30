@@ -1,5 +1,10 @@
 """Drag and drop system. DraggableItems can be dragged between DraggableTiles in the same group."""
+from copy import deepcopy
+
+from panda3d.core import MouseButton
+
 from BetterDirectGui.DirectGui.DirectButton import DirectButton
+from BetterDirectGui.DirectGui.DirectLabel import DirectLabel
 from BetterDirectGui.DirectGui import DGG
 
 
@@ -90,6 +95,17 @@ class DraggableItem(DirectButton):
             ('selectable',      True,      None),
             # An offset to apply to the items placement in a tile.
             ('placementOffset', (0, 0),    None),
+            # Used to determine if two different items can be combined into a stack
+            ('itemType',        0,         None),
+            # The number of items that can stack in the same tile,
+            # this should be the same for all items of the same itemType
+            ('stackSize',       1,         None),
+            # The current number of items in the stack
+            ('itemCount',       1,         self._itemCount),
+            # Button used to grab or release item
+            ('selectButton',  DGG.B1CLICK, self._selectButton),
+            # Button to grab half the stack or release a single item
+            ('splitButton',   DGG.B3CLICK, self._splitButton),
         )
 
         # Merge keyword options with default options
@@ -98,6 +114,12 @@ class DraggableItem(DirectButton):
         # Initialize superclasses
         DirectButton.__init__(self, parent)
 
+        self.count = self.createcomponent("count", (), None,
+                                          DirectLabel, (self,),
+                                          text="X",
+                                          scale=0.3
+                                          )
+
         # Call option initialization functions
         self.initialiseoptions(DraggableItem)
 
@@ -105,11 +127,64 @@ class DraggableItem(DirectButton):
         self._is_dragged = False
         self._old_parent = None
         self._task = None
-        self.bind(DGG.B1PRESS, self._grab)
-        self.bind(DGG.B1RELEASE, self._release)
+
+        self._itemCount()
+        self._selectButton()
+        self.guiItem.addClickButton(MouseButton.three())
+        self._splitButton()
 
         # Apply the theme to self
         self.add_theming_options(kw, parent, DraggableItem)
+        print(self.getAllBound())
+
+    def _selectButton(self):
+        button = self["selectButton"]
+        if button is None:
+            return
+        elif isinstance(button, (list, tuple)):
+            self.bind(button[0], self._grab)
+            self.bind(button[1], self._release)
+        else:
+            self.bind(button, self._grab_or_release)
+
+    def _splitButton(self):
+        button = self["splitButton"]
+        if button is None:
+            return
+        self.bind(button, self._split)
+
+    def resetCountPosition(self):
+        frameSize = None
+        if self["frameSize"]:
+            frameSize = self["frameSize"]
+        else:
+            frameSize = self.bounds
+
+        if frameSize is None:
+            frameSize = (0,) * 4
+
+        count_frameSize = None
+        if self.count["frameSize"]:
+            count_frameSize = self.count["frameSize"]
+        else:
+            count_frameSize = self.count.bounds
+
+        if count_frameSize is None:
+            count_frameSize = (0,) * 4
+
+        self.count.set_pos(frameSize[1] + (count_frameSize[0] + self.count["borderWidth"][0]) * self.count.getScale().x,
+                           0,
+                           frameSize[2] + (count_frameSize[2] + self.count["borderWidth"][1]) * self.count.getScale().z)
+
+    def _itemCount(self):
+        if self["stackSize"] == 1:
+            self.count.hide()
+        else:
+            self.count.show()
+        count = self["itemCount"]
+        self.count["text"] = str(count)
+        self.count.resetFrameSize()
+        self.resetCountPosition()
 
     def getCenterPosition(self) -> tuple[float, float]:
         """Method to get the center position of the self."""
@@ -128,6 +203,40 @@ class DraggableItem(DirectButton):
         center_x = (width / 2 + frameSize[0]) * self.getScale().x
 
         return center_x, center_z
+
+    def _split(self, _):
+        if not self._is_dragged:
+            self._is_dragged = True
+
+            self._old_parent = base.gui_controller._get_gui(self.parent)
+            assert self._old_parent is not None, f"{self} has an invalid parent node. It should be parented to a 'DraggableTile'"
+
+            self.wrt_reparent_to(base.aspect2d)
+            self._task = self.addTask(self._drag_task, "drag")
+
+            count = self["itemCount"]
+            self["itemCount"] -= count//2
+            if count//2 != 0:
+                other_half = self.copy()
+                other_half["itemCount"] = count//2
+                self._old_parent["content"] = other_half
+
+        else:  # todo fix this
+            return
+            self._is_dragged = False
+            new_parent = DraggableTile._target
+
+            if new_parent is not None and new_parent["group"] != self["group"]:
+                new_parent = None
+
+            self.removeTask(self._task)
+            self.setPos(self["placementOffset"][0], 0, self["placementOffset"][1])
+
+    def _grab_or_release(self, _):
+        if self._is_dragged:
+            self._release(None)
+        else:
+            self._grab(None)
 
     def _grab(self, _):
         if self._is_dragged:
@@ -155,11 +264,34 @@ class DraggableItem(DirectButton):
 
         if new_parent is None:
             new_parent = self._old_parent
-        else:
-            if new_parent["content"] is not None:
-                self._old_parent["content"] = new_parent["content"]
+        if new_parent["content"] is not None and new_parent["content"] is not self:
+
+            # The item is unstackable or the itemtypes are different
+            if self["stackSize"] == 1 or self["itemType"] != new_parent["content"]["itemType"]:
+                if self._old_parent["content"] is self:
+                    self._old_parent["content"] = new_parent["content"]
+                else:  # The stack was split so there are some items left
+                    new_parent["content"]._grab(None)
+
+            # The items can be stacked
+            elif self["itemCount"] + new_parent["content"]["itemCount"] <= self["stackSize"]:
+                self["itemCount"] += new_parent["content"]["itemCount"]
+                new_parent["content"].destroy()
+                new_parent["content"] = None
+                if self._old_parent["content"] is self:
+                    self._old_parent["content"] = None
+
+            # They can be stacked, but some items will be left over
             else:
-                self._old_parent["content"] = None
+                items_to_move = self["stackSize"] - new_parent["content"]["itemCount"]
+                new_parent["content"]["itemCount"] = self["stackSize"]
+                self["itemCount"] -= items_to_move
+                self._old_parent["content"] = self
+                self._grab(None)
+                return
+
+        elif self._old_parent["content"] is self:
+            self._old_parent["content"] = None
 
         new_parent["content"] = self
 

@@ -358,6 +358,13 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
         config = self._optionInfo[option_name]
         return config[DGG._OPT_DEFAULT]
 
+    def copy(self):
+        new_widget = type(self)(**self._kw)
+        if new_widget._theme != self._theme:
+            new_widget.set_theme(self._theme, self._theme_priority)
+
+        return new_widget
+
     def bind(self, event, command, extraArgs=[]):
         """Bind the command (which should expect one arg) to the specified
         event (such as ENTER, EXIT, B1PRESS, B1CLICK, etc.)
@@ -384,6 +391,11 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
         return self.isAccepting(gEvent)
 
     is_bound = isBound
+
+    def getAllBound(self):
+        return self.getAllAccepting()
+
+    get_all_bound = getAllBound
 
     def isUnbound(self, event):
         gEvent = event + self.guiId
