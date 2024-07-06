@@ -1,8 +1,10 @@
-"""Module with subclass of DirectGuiWidget that implements keyboard navigation."""
+"""Module with subclass of DirectGuiWidget that implements keyboard navigation.
+Along with some other features that BetterDirectGui offers."""
 from __future__ import annotations
 import direct.gui.DirectGuiBase as DirectGuiBase
 import direct.gui.DirectGuiGlobals as DGG
 import panda3d.core as p3d
+from BetterDirectGui.GuiTools import GuiUtil
 
 from typing import Any
 from collections.abc import MutableSequence, MutableMapping, MutableSet
@@ -268,7 +270,7 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
 
             self.configure(**{key: value})
 
-        children = base.gui_controller._get_gui_children(self)
+        children = GuiUtil.get_gui_children(self)
         for child in children:  # propagate the theme to the children
             child.set_theme(theme, priority)
 
@@ -338,11 +340,11 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
 
         self._kw = kw.copy()
 
-        if not base.gui_controller._do_theming:
+        if not base.gui_controller.do_theming:
             return
 
         name = type(self).__name__
-        if base.gui_controller._is_gui(parent) and parent._theme is not None:
+        if GuiUtil.is_gui(parent) and parent._theme is not None:
             themes = parent._theme
             self._theme = themes
             self._theme_priority = parent._theme_priority
@@ -355,10 +357,13 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
         self._apply_theme()
 
     def get_default(self, option_name: str) -> Any:
+        """Get the default value of the option.
+        The default in this case meaning either the actual default or the value passed at creation time for self."""
         config = self._optionInfo[option_name]
         return config[DGG._OPT_DEFAULT]
 
-    def copy(self):
+    def copy(self):  # todo make sure components options are also updated (there might be options saved in comp._kw)
+        """Creates a copy of self with the same options set and the same theme."""
         new_widget = type(self)(**self._kw)
         if new_widget._theme != self._theme:
             new_widget.set_theme(self._theme, self._theme_priority)
@@ -387,17 +392,21 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
             self.bind(DGG.B1PRESS, self._set_active)
 
     def isBound(self, event):
+        """Check if the given event is bound to self."""
         gEvent = event + self.guiId
         return self.isAccepting(gEvent)
 
     is_bound = isBound
 
     def getAllBound(self):
-        return self.getAllAccepting()
+        """Get all events that are bound to self."""
+        all_accepting = self.getAllAccepting()
+        return [event for event in all_accepting if event.endswith(self.guiId)]
 
     get_all_bound = getAllBound
 
     def isUnbound(self, event):
+        """Check if the event is not bound to self."""
         gEvent = event + self.guiId
         return self.isIgnoring(gEvent)
 
@@ -410,7 +419,13 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
         base.gui_controller._do_highlight = False
 
         if self["selectable"]:
-            if base.gui_controller.current_selection is not None and base.gui_controller.current_selection is not self:
+            if base.gui_controller.current_selection is None:
+                pass
+            elif base.gui_controller.current_selection is self:
+                pass
+            elif not hasattr(base.gui_controller.current_selection,"_optionInfo"):
+                pass
+            else:
                 base.gui_controller.current_selection["selected"] = False
 
             base.gui_controller.current_selection = self

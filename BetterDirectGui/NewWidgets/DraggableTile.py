@@ -1,11 +1,10 @@
 """Drag and drop system. DraggableItems can be dragged between DraggableTiles in the same group."""
-from copy import deepcopy
-
 from panda3d.core import MouseButton
 
 from BetterDirectGui.DirectGui.DirectButton import DirectButton
 from BetterDirectGui.DirectGui.DirectLabel import DirectLabel
 from BetterDirectGui.DirectGui import DGG
+from BetterDirectGui.GuiTools import GuiUtil
 
 
 __all__ = ["DraggableItem", "DraggableTile"]
@@ -135,7 +134,6 @@ class DraggableItem(DirectButton):
 
         # Apply the theme to self
         self.add_theming_options(kw, parent, DraggableItem)
-        print(self.getAllBound())
 
     def _selectButton(self):
         button = self["selectButton"]
@@ -243,7 +241,7 @@ class DraggableItem(DirectButton):
             return
 
         self._is_dragged = True
-        self._old_parent = base.gui_controller._get_gui(self.parent)
+        self._old_parent = GuiUtil.get_gui(self.parent)
         assert self._old_parent is not None, f"{self} has an invalid parent node. It should be parented to a 'DraggableTile'"
 
         self.wrt_reparent_to(base.aspect2d)
@@ -260,7 +258,6 @@ class DraggableItem(DirectButton):
             new_parent = None
 
         self.removeTask(self._task)
-        self.setPos(self["placementOffset"][0], 0, self["placementOffset"][1])
 
         if new_parent is None:
             new_parent = self._old_parent

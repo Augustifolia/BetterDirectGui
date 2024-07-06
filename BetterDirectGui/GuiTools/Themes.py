@@ -1,9 +1,14 @@
+"""Module with some default themes to get more modern gui:s out of the box."""
 import direct.gui.DirectGuiGlobals as DGG
 from panda3d.core import Filename
 import os
 
 
-root = Filename.fromOsSpecific(os.path.dirname(__file__))
+# some useful directories
+root = Filename.fromOsSpecific(os.path.dirname(os.path.dirname(__file__)))
+assets = Filename.fromOsSpecific(os.path.join(root, "assets"))
+dark = Filename.fromOsSpecific(os.path.join(assets, "dark"))
+light = Filename.fromOsSpecific(os.path.join(assets, "light"))
 
 __all__ = ["default_theme"]
 
@@ -13,7 +18,7 @@ default_theme = {
         text_shadow=(.6, .6, .6, 1),
         text_shadowOffset=(0.05, 0.05),
         relief=DGG.TEXTUREBORDER,
-        frameTexture=f"{root}/assets/border.png",
+        frameTexture=f"{assets}/border.png",
         borderUvWidth=(.15, .15),
         transparency=True,
         frameColor=(.4, .7, .4, 1),
