@@ -487,7 +487,7 @@ class GuiController(DirectObject):
 
         parent = GuiUtil.get_parent(self.current_selection)
         children = GuiUtil.get_selectable_gui_children(parent)
-        next_item = children[0]
+        next_item = children[0]  # todo this list might be empty
         for index, child in enumerate(children):
             if child == self.current_selection:
                 if index + 1 >= len(children):

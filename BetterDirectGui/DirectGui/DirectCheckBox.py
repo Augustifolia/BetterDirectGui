@@ -75,6 +75,10 @@ class DirectCheckBox(DirectButton):
 
         self.setImage()
 
+        if base.gui_controller._do_bug_fixes:
+            if self["frameSize"] is None:
+                self.resetFrameSize()
+
     def click(self):
         self.commandFunc("")
         self.show_click()

@@ -90,6 +90,7 @@ class DirectEntry(DirectFrame):
             optiondefs += (
                 ('enteredText', None, self._enteredText),
                 ('entryFont', None, self._entry_font),
+                ('cursorColor', None, self._cursor_color),
             )
         else:
             optiondefs += (
@@ -163,6 +164,29 @@ class DirectEntry(DirectFrame):
 
         # Apply the theme to self
         self.add_theming_options(kw, parent, DirectEntry)
+
+    def _comp_update_func(self, **kwargs):
+        text = self.get()
+        self.setup()
+        self.enterText(text)
+        self.resetFrameSize()
+
+    def _cursor_color(self):
+        color = self["cursorColor"]
+        if color is None:
+            return
+
+        line_height = self.guiItem.get_text_def(1).get_line_height()
+        cursor = self.guiItem.get_cursor_def()
+
+        old_cursor = cursor.find("lines")
+        old_cursor.removeNode()
+
+        ls = LineSegs("lines")
+        ls.set_color(color)
+        ls.move_to(0.0, 0.0, -0.15 * line_height)
+        ls.draw_to(0.0, 0.0, 0.70 * line_height)
+        cursor.attachNewNode(ls.create())
 
     def _enteredText(self):
         if self["enteredText"] is not None:

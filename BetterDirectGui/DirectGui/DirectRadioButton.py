@@ -102,6 +102,8 @@ class DirectRadioButton(DirectButton):
                                               relief = self['boxRelief'],
                                               )
 
+        self.indicator._comp_update_func = self._indicator_update_func
+
         # Call option initialization functions
         self.initialiseoptions(DirectRadioButton)
         # After initialization with X giving it the correct size, put back space
@@ -131,6 +133,13 @@ class DirectRadioButton(DirectButton):
 
         # Apply the theme to self
         self.add_theming_options(kw, parent, DirectRadioButton)
+
+    def _indicator_update_func(self, **kwargs):
+        for key in kwargs:
+            if "text" in key:
+                return
+
+        self.indicator.resetFrameSize()
 
     def _update_box_geom_image(self):
         skip = False
@@ -215,17 +224,18 @@ class DirectRadioButton(DirectButton):
             ibw = self.indicator['borderWidth']
             indicatorWidth = (self.indicator.getWidth() + (2*ibw[0]))
             indicatorHeight = (self.indicator.getHeight() + (2*ibw[1]))
-            diff_y = (indicatorHeight + (2 * self['boxBorder']) -
-                      (self.bounds[3] - self.bounds[2]))
-
-            # check size in x direction to fit the indicator
             if "text0" in self.components():
                 text = self.component("text0")
                 text_bounds = text.getTightBounds()
             else:
                 text_bounds = (Vec3(0), Vec3(0))
             text_width = text_bounds[1].x - text_bounds[0].x
-            space_left = (self.bounds[1] - self.bounds[0]) - text_width - 2*self["borderWidth"][0]
+            text_height = text_bounds[1].z - text_bounds[0].z
+            diff_y = (max(indicatorHeight, text_height) + (2 * self['boxBorder']) -
+                      (self.bounds[3] - self.bounds[2]))
+
+            # check size in x direction to fit the indicator
+            space_left = (self.bounds[1] - self.bounds[0]) - text_width - self["borderWidth"][0]
             diff_x = indicatorWidth + 2 * self['boxBorder'] - space_left
 
             # If background is smaller then indicator, enlarge background

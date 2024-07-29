@@ -17,6 +17,7 @@ class GuiFactory:
         gui_item = self.gui_type(parent, **kw)
         priority = gui_item._theme_priority
         theme_ = ThemeUtil.merge(self.theme, theme)
-        gui_item.set_theme(theme_, priority + 1)
+        if theme_ != {}:
+            gui_item.set_theme(theme_, priority + 1)
 
         return gui_item

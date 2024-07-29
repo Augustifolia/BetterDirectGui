@@ -125,6 +125,12 @@ class DirectOptionMenu(DirectButton):
         # Apply the theme to self
         self.add_theming_options(kw, parent, DirectOptionMenu)
 
+    def _comp_update_func(self, **kwargs):
+        for key in kwargs:
+            if "text" in key:
+                return
+        self.setItems()
+
     def _update_marker_border(self):
         if not self.fInit:
             self.setItems()
@@ -201,6 +207,13 @@ class DirectOptionMenu(DirectButton):
                 text = item, text_align = TextNode.ALeft,
                 command = lambda i = itemIndex: self.set(i))
             bounds = c.getBounds()
+            cbw = c["borderWidth"]
+            bounds = [
+                bounds[0] - cbw[0],
+                bounds[1] + cbw[0],
+                bounds[2] - cbw[1],
+                bounds[3] + cbw[1]
+            ]
             if self.minX == None:
                 self.minX = bounds[0]
             elif bounds[0] < self.minX:
@@ -250,7 +263,7 @@ class DirectOptionMenu(DirectButton):
         # Position popup Marker to the right of the button
         pm = self.popupMarker
         pmw = (pm.getWidth() * pm.getScale()[0] +
-               2 * self['popupMarkerBorder'][0])
+               2 * self['popupMarkerBorder'][0] * pm.getScale()[0])
         if self.initFrameSize:
             # Use specified frame size
             bounds = list(self.initFrameSize)
@@ -261,8 +274,9 @@ class DirectOptionMenu(DirectButton):
             # Use specified position
             pmPos = list(self.initPopupMarkerPos)
         else:
+            bw = self["borderWidth"]
             # Or base the position on the frame size.
-            pmPos = [bounds[1] + pmw/2.0, 0, bounds[2] + (bounds[3] - bounds[2])/2.0]
+            pmPos = [bounds[1] + pmw/2.0 - 1 * bw[0], 0, bounds[2] + (bounds[3] - bounds[2])/2.0]
         pm.setPos(pmPos[0], pmPos[1], pmPos[2])
         # Adjust popup menu button to fit all items (or use user specified
         # frame size

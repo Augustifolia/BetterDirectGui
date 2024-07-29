@@ -46,13 +46,13 @@ if __name__ == '__main__':
     BetterDirectGui.init()  # do_keyboard_navigation=False)  # init BetterDirectGui after ShowBase
 
     # create some gui
-    run_test = 0
+    run_test = 8
 
     # which theme to apply
     do_theme = 1
 
     # use default theme
-    theme = Themes.default_theme
+    theme = Themes.dark_theme
 
     if do_theme == 0:  # todo if a theme is applied before the gui is created, some options are not set correctly
         base.gui_controller.set_theme(theme)
@@ -75,6 +75,8 @@ if __name__ == '__main__':
         test_scroll()
     elif run_test == 7:
         import tests.draggable_tile_test
+    elif run_test == 8:
+        from tests import all_no_options
 
     if do_theme == 1:
         base.gui_controller.set_theme(theme)

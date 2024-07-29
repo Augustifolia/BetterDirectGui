@@ -91,6 +91,34 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
         # Apply the theme to self
         self.add_theming_options(kw, parent, DirectGuiWidget)
 
+    def _comp_update_func(self, **kwargs):
+        self.resetFrameSize()
+
+    def createcomponent(
+        self,
+        componentName,
+        componentAliases,
+        componentGroup,
+        widgetClass,
+        *widgetArgs,
+        **kw,
+    ):
+        # Make sure to include any options set earlier
+        itemKW = {}
+        # check for component group
+        if componentGroup is not None:
+            for i in self._kw:
+                if i.startswith(f"{componentGroup}_"):
+                    itemKW[i.removeprefix(f"{componentGroup}_")] = self._kw[i]
+
+        # override with values set for this specific component
+        for i in self._kw:
+            if i.startswith(f"{componentName}_"):
+                itemKW[i.removeprefix(f"{componentName}_")] = self._kw[i]
+
+        kw.update(itemKW)
+        return super().createcomponent(componentName, componentAliases, componentGroup, widgetClass, *widgetArgs, **kw)
+
     def _handle_parent_scrolling(self):
         # Make sure that children of DirectScrolledFrames get bound to scroll events
         # to make sure scrolling works properly
@@ -270,12 +298,23 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
 
             self.configure(**{key: value})
 
+            if base.gui_controller.do_bug_fixes:
+                # make sure to also update the widget if a component has been updated
+                if "_" in key and self._comp_update_func is not None:
+                    self._comp_update_func(**{key: value})
+
         children = GuiUtil.get_gui_children(self)
         for child in children:  # propagate the theme to the children
             child.set_theme(theme, priority)
 
     def __setitem__(self, key, value):
         super().__setitem__(key, value)
+
+        if base.gui_controller.do_bug_fixes:
+            # make sure to also update the widget if a component has been updated
+            if "_" in key and self._comp_update_func is not None:
+                self._comp_update_func(**{key: value})
+
         self._kw[key] = value  # keep track of the options set directly by the user, used for themability
 
     def clear_theme(self):
@@ -324,7 +363,7 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
         self._theme_priority = -1
         self._theme = None
 
-        children = base.gui_controller._get_gui_children(self)
+        children = GuiUtil.get_gui_children(self)
         for child in children:  # clear the theme for the children
             child.clear_theme()
 

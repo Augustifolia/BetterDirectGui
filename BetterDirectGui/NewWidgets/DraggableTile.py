@@ -152,7 +152,7 @@ class DraggableItem(DirectButton):
         self.bind(button, self._split)
 
     def resetCountPosition(self):
-        frameSize = None
+        """Resets the position of the count component."""
         if self["frameSize"]:
             frameSize = self["frameSize"]
         else:
@@ -161,7 +161,6 @@ class DraggableItem(DirectButton):
         if frameSize is None:
             frameSize = (0,) * 4
 
-        count_frameSize = None
         if self.count["frameSize"]:
             count_frameSize = self.count["frameSize"]
         else:
@@ -186,7 +185,6 @@ class DraggableItem(DirectButton):
 
     def getCenterPosition(self) -> tuple[float, float]:
         """Method to get the center position of the self."""
-        frameSize = None
         if self["frameSize"]:
             frameSize = self["frameSize"]
         else:
@@ -206,7 +204,7 @@ class DraggableItem(DirectButton):
         if not self._is_dragged:
             self._is_dragged = True
 
-            self._old_parent = base.gui_controller._get_gui(self.parent)
+            self._old_parent = GuiUtil.get_gui(self.parent)
             assert self._old_parent is not None, f"{self} has an invalid parent node. It should be parented to a 'DraggableTile'"
 
             self.wrt_reparent_to(base.aspect2d)
