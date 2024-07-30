@@ -37,7 +37,7 @@ guis = [
 
     # NewWidgets widgets,
     DraggableTile(),
-    DraggableItem(text="XX"),
+    DraggableItem(frameTexture="models/maps/circle.png"),
 ]
 
 for gui in guis:
@@ -45,4 +45,4 @@ for gui in guis:
 
 base.accept("space", cycle_through_gui, extraArgs=[guis, [-2]])
 base.messenger.send("space")
-base.gui_controller.set_theme(Themes.dark_theme)
+# base.gui_controller.set_theme(Themes.dark_theme)

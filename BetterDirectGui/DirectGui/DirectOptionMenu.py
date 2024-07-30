@@ -360,11 +360,16 @@ class DirectOptionMenu(DirectButton):
     def _highlightItem(self, item, index):
         """ Set frame color of highlighted item, record index """
         self._prevItemTextScale = item['text_scale']
+        h_scale = self["highlightScale"]
         if base.gui_controller.do_bug_fixes:
             self._prevItemFrameColor = item["frameColor"]
+            item['text_scale'] = (self._prevItemTextScale[0] * h_scale[0], self._prevItemTextScale[1] * h_scale[1])
+        else:
+            item['text_scale'] = h_scale
+
         item['frameColor'] = self['highlightColor']
-        item['frameSize'] = (self['highlightScale'][0]*self.minX, self['highlightScale'][0]*self.maxX, self['highlightScale'][1]*self.minZ, self['highlightScale'][1]*self.maxZ)
-        item['text_scale'] = self['highlightScale']
+        item['frameSize'] = (h_scale[0]*self.minX, h_scale[0]*self.maxX, h_scale[1]*self.minZ, h_scale[1]*self.maxZ)
+
         self.highlightedIndex = index
 
     def _unhighlightItem(self, item, frameColor):

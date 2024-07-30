@@ -425,8 +425,8 @@ class GuiController(DirectObject):
         if next_item is None and self.current_selection is None:
             return
 
-        while True:
-            while True:
+        for _ in range(1000):
+            for _ in range(1000):
                 if next_item is None:
                     self.current_selection = GuiUtil.get_gui(GuiUtil.get_parent(self._current_selection))
                     if self.current_selection is not None:
@@ -455,7 +455,7 @@ class GuiController(DirectObject):
         if next_item is None and self.current_selection is None:
             return
 
-        while True:
+        for _ in range(1000):
             if next_item is None:
                 self.current_selection = GuiUtil.get_gui(GuiUtil.get_parent(self._current_selection))
                 next_item = self._get_previous_on_level(GuiUtil.get_parent(self.current_selection),
@@ -487,7 +487,11 @@ class GuiController(DirectObject):
 
         parent = GuiUtil.get_parent(self.current_selection)
         children = GuiUtil.get_selectable_gui_children(parent)
-        next_item = children[0]  # todo this list might be empty
+        if children:
+            next_item = children[0]
+        else:  # sometimes there are no valid children, start from base np instead
+            children = GuiUtil.get_selectable_gui_children(self._base_np)
+            next_item = children[0]
         for index, child in enumerate(children):
             if child == self.current_selection:
                 if index + 1 >= len(children):
@@ -512,7 +516,11 @@ class GuiController(DirectObject):
 
         parent = GuiUtil.get_parent(self.current_selection)
         children = GuiUtil.get_selectable_gui_children(parent)
-        next_item = children[0]
+        if children:
+            next_item = children[0]
+        else:  # sometimes there are no valid children, start from base np instead
+            children = GuiUtil.get_selectable_gui_children(self._base_np)
+            next_item = children[0]
         for index, child in enumerate(children):
             if child == self.current_selection:
                 next_item = children[index - 1]

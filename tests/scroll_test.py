@@ -21,38 +21,38 @@ class GUI:
     def __init__(self, rootParent=None):
         
         self.pg298 = DirectScrolledFrame(
-            state = 'normal',
-            frameColor = (1, 1, 1, 1),
-            pos = LPoint3f(0, 0, 0),
-            borderWidth=(.03, .03),
-            scale=2,
+            # state = 'normal',
+            # frameSize = (1, 1, 1, 1),
+            # pos = LPoint3f(0, 0, 0),
+            # borderWidth=(.03, .03),
+            # scale=2,
             parent=rootParent,
         )
         self.pg298.setTransparency(0)
 
         self.pg714 = DirectButton(
             pos = LPoint3f(-.675, 0, 0.8),
-            scale = LVecBase3f(0.1, 0.1, 0.1),
+            # scale = LVecBase3f(0.1, 0.1, 0.1),
             text = 'button',
             # parent=self.pg298.canvas,
-            pressEffect=1,
+            # pressEffect=1,
         )
         self.pg714.setTransparency(0)
         self.pg714.reparentTo(self.pg298.canvas)
 
         self.pg1911 = DirectEntry(
             pos = LPoint3f(-1.075, 0, 0.525),
-            scale = LVecBase3f(0.1, 0.1, 0.1),
+            # scale = LVecBase3f(0.1, 0.1, 0.1),
             parent=self.pg298.canvas,
         )
         self.pg1911.setTransparency(0)
 
         self.pg2861 = DirectButton(
             pos = LPoint3f(-0.75, 0, 0.25),
-            scale = LVecBase3f(0.1, 0.1, 0.1),
+            # scale = LVecBase3f(0.1, 0.1, 0.1),
             text = 'button',
             parent=self.pg298.canvas,
-            pressEffect=1,
+            # pressEffect=1,
         )
         self.pg2861.setTransparency(0)
 
@@ -60,23 +60,23 @@ class GUI:
             frameSize = (-1, 1, -1, 1),
             frameColor = (1, 1, 1, 1),
             pos = LPoint3f(0.975, 0, 0.075),
-            scale=0.5,
+            # scale=0.5,
             parent=self.pg298.canvas,
         )
         self.pg4088.setTransparency(0)
 
         self.pg4417 = DirectButton(
             pos = LPoint3f(-0.525, 0, 0.425),
-            scale = LVecBase3f(0.1, 0.1, 0.1),
+            # scale = LVecBase3f(0.1, 0.1, 0.1),
             text = 'button',
             parent=self.pg4088,
-            pressEffect=1,
+            # pressEffect=1,
         )
         self.pg4417.setTransparency(0)
 
         self.pg5438 = DirectEntry(
             pos = LPoint3f(-0.775, 0, 0.075),
-            scale = LVecBase3f(0.1, 0.1, 0.1),
+            # scale = LVecBase3f(0.1, 0.1, 0.1),
             parent=self.pg4088,
         )
         self.pg5438.setTransparency(0)

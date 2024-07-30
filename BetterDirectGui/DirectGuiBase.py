@@ -91,6 +91,18 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
         # Apply the theme to self
         self.add_theming_options(kw, parent, DirectGuiWidget)
 
+    def hide(self, *args):
+        super().hide(*args)
+        if base.gui_controller.do_keyboard_navigation and self["selected"]:
+            self["selected"] = False
+            base.gui_controller.activate_keys()
+
+    def stash(self, *args, **kwargs):
+        super().stash(*args, **kwargs)
+        if base.gui_controller.do_keyboard_navigation and self["selected"]:
+            self["selected"] = False
+            base.gui_controller.activate_keys()
+
     def _comp_update_func(self, **kwargs):
         self.resetFrameSize()
 

@@ -124,7 +124,7 @@ class DirectScrolledFrame(DirectFrame):
             self,
             self.verticalScroll,
             self.verticalScroll.thumb,
-            # self.verticalScroll.incButton,
+            # self.verticalScroll.incButton,  # scrolling does not really work with these buttons
             # self.verticalScroll.decButton,
             self.horizontalScroll,
             self.horizontalScroll.thumb,
@@ -136,6 +136,9 @@ class DirectScrolledFrame(DirectFrame):
             for node in element_list:
                 node.bind(DGG.MWUP, self._scroll, extraArgs=[-1])
                 node.bind(DGG.MWDOWN, self._scroll, extraArgs=[1])
+
+            # set state to 'normal' to be able to catch scroll events
+            self["state"] = DGG.NORMAL
 
         else:
             for node in element_list:

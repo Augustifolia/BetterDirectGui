@@ -8,9 +8,9 @@ d3 = DraggableTile(pos=(0, 0, 0))
 d4 = DraggableTile(pos=(.25, 0, 0))
 d5 = DraggableTile(pos=(.5, 0, 0))
 
-i1 = DraggableItem(frameColor=(0.1, 1, .1, 1), text="1", scale=0.2)
+i1 = DraggableItem(stackSize=4, frameTexture="models/maps/circle.png")
 d1["content"] = i1
-i2 = DraggableItem(frameColor=(0.1, 1, .1, 1), text="2", scale=0.2)
+i2 = DraggableItem(frameTexture="models/maps/circle.png")
 d3["content"] = i2
 
 d1 = DraggableTile(pos=(-.5, 0, -.3), group=1)
@@ -19,9 +19,9 @@ d3 = DraggableTile(pos=(0, 0, -.3), group=1)
 d4 = DraggableTile(pos=(.25, 0, -.3), group=1)
 d5 = DraggableTile(pos=(.5, 0, -.3), group=1)
 
-i1 = DraggableItem(frameColor=(0.1, 1, .1, 1), text="1", scale=0.2, group=1)
+i1 = DraggableItem(frameTexture="models/maps/circle.png", group=1)
 d1["content"] = i1
-i2 = DraggableItem(frameColor=(0.1, 1, .1, 1), text="2", scale=0.2, group=1)
+i2 = DraggableItem(frameTexture="models/maps/circle.png", group=1)
 d3["content"] = i2
 
 # testing stackable items

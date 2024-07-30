@@ -47,6 +47,10 @@ class DraggableTile(DirectButton):
         # Apply the theme to self
         self.add_theming_options(kw, parent, DraggableTile)
 
+    def _comp_update_func(self, **kwargs):
+        super()._comp_update_func(**kwargs)
+        self.addItem(self["content"])
+
     def addItem(self, item):
         """Convenience method to add some content widget to self.
 
@@ -105,6 +109,10 @@ class DraggableItem(DirectButton):
             ('selectButton',  DGG.B1CLICK, self._selectButton),
             # Button to grab half the stack or release a single item
             ('splitButton',   DGG.B3CLICK, self._splitButton),
+            ('relief',        DGG.FLAT,    None),
+            ('frameSize',     [-.08, .08, -.08, .08], None),
+            ('count_text_scale', 1/12,     None),
+            ('count_frameSize', [-.03, .03, -.01, .05], None)
         )
 
         # Merge keyword options with default options
@@ -116,7 +124,6 @@ class DraggableItem(DirectButton):
         self.count = self.createcomponent("count", (), None,
                                           DirectLabel, (self,),
                                           text="X",
-                                          scale=0.3
                                           )
 
         # Call option initialization functions
@@ -134,6 +141,13 @@ class DraggableItem(DirectButton):
 
         # Apply the theme to self
         self.add_theming_options(kw, parent, DraggableItem)
+
+    def _comp_update_func(self, **kwargs):
+        super()._comp_update_func(**kwargs)
+        # re-add self to parent to make sure alignment is correct
+        if isinstance(GuiUtil.get_gui(self.parent), DraggableTile):
+            GuiUtil.get_gui(self.parent).addItem(self)
+        self.resetCountPosition()
 
     def _selectButton(self):
         button = self["selectButton"]
@@ -169,9 +183,9 @@ class DraggableItem(DirectButton):
         if count_frameSize is None:
             count_frameSize = (0,) * 4
 
-        self.count.set_pos(frameSize[1] + (count_frameSize[0] + self.count["borderWidth"][0]) * self.count.getScale().x,
+        self.count.set_pos(frameSize[1] + (count_frameSize[0]) * self.count.getScale().x,
                            0,
-                           frameSize[2] + (count_frameSize[2] + self.count["borderWidth"][1]) * self.count.getScale().z)
+                           frameSize[2] + (-count_frameSize[2]) * self.count.getScale().z)
 
     def _itemCount(self):
         if self["stackSize"] == 1:
