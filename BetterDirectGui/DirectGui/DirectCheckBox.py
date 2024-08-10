@@ -67,13 +67,15 @@ class DirectCheckBox(DirectButton):
         # Apply the theme to self
         self.add_theming_options(kw, parent, DirectCheckBox)
 
+    def _comp_update_func(self, **kwargs):
+        self.resetFrameSize()
+        self._update_image()
+
     def _update_image(self):
         if self['isChecked']:
             self['image'] = self['checkedImage']
         else:
             self['image'] = self['uncheckedImage']
-
-        self.setImage()
 
         if base.gui_controller._do_bug_fixes:
             if self["frameSize"] is None:

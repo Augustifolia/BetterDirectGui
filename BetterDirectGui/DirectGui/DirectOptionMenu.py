@@ -193,6 +193,7 @@ class DirectOptionMenu(DirectButton):
                                               )
         # Make sure it is on top of all the other gui widgets
         self.popupMenu.setBin('gui-popup', 0)
+        self.popupMenu._update_comp = True  # stop popupMenu from generating updates and causing a RecursionError
         self.highlightedIndex = None
         if not self['items']:
             return

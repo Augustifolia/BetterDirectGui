@@ -79,16 +79,13 @@ default_theme_no_scale = {
         # indicator_scale=0.2,  # does not update properly
         # indicator_frameSize=[-.05, .05, -.05, .05],
         indicator_frameTexture=(f"{assets}/toggle_off.png", f"{assets}/toggle_on.png"),
+        # boxImage=(f"{assets}/toggle_off.png", f"{assets}/toggle_on.png"),
         indicator_frameColor=(1, 1, 1, 1),
         indicator_borderWidth=(.0, .0),
         indicator_relief=DGG.FLAT,
         indicator_text=" ",
     ),
-    "OkCancelDialog": dict(  # todo add a good way to theme all dialogs at once, perhaps "generalDialog"
-        # buttonTextList=["Ok", "No"],
-        # buttonValueList=[DGG.DIALOG_OK, DGG.DIALOG_NO]
-        # borderWidth=(.1, .1),
-        # button_borderWidth=(.1, .1),
+    "sub-DirectDialog": dict(
         button_relief=DGG.TEXTUREBORDER,
     ),
     "DirectEntry": dict(

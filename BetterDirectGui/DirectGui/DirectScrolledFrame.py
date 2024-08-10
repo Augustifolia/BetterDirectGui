@@ -85,6 +85,21 @@ class DirectScrolledFrame(DirectFrame):
         # Apply the theme to self
         self.add_theming_options(kw, parent, DirectScrolledFrame)
 
+        self.verticalScroll._comp_update_func = self._verticalScroll_comp_update_func
+        self.horizontalScroll._comp_update_func = self._horizontalScroll_comp_update_func
+
+    def _verticalScroll_comp_update_func(self, **kwargs):
+        if self["manageScrollBars"]:
+            return
+
+        self.verticalScroll._comp_update_func(**kwargs)
+
+    def _horizontalScroll_comp_update_func(self, **kwargs):
+        if self["manageScrollBars"]:
+            return
+
+        self.horizontalScroll._comp_update_func(**kwargs)
+
     def scrollStep(self, direction, steps):
         if direction == "v":
             active_bar = self.verticalScroll

@@ -206,7 +206,9 @@ class DirectFrame(DirectGuiWidget):
                     # Destroy component
                     self.destroycomponent(component)
                 else:
-                    self[component + '_image'] = image
+                    # self[component + '_image'] = image
+                    comp = self.component(component)
+                    comp["image"] = image
             else:
                 if image == None:
                     return

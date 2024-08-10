@@ -13,7 +13,10 @@ def merge(theme1: dict[str: dict[str: Any]] = None, theme2: dict[str: dict[str: 
         return new_theme
 
     for key, value in theme2.items():
-        new_theme[key].update(value)
+        if key in new_theme:
+            new_theme[key].update(value)
+        else:
+            new_theme[key] = value
 
     return new_theme
 

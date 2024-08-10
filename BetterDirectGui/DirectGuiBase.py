@@ -270,16 +270,7 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
         if theme is None:
             return
 
-        name = type(self).__name__
-
-        gui_theme = {}
-        if name in theme:
-            gui_theme = theme[name]  # get theme for this gui-type
-        # merge general options, the specific theme for this element overrides values from the general theme
-        if "general" in theme:
-            gen_theme = theme["general"].copy()
-            gen_theme.update(gui_theme)
-            gui_theme = gen_theme
+        gui_theme = self._get_theme_options(theme)
 
         for key, value in gui_theme.items():
             if key in self._kw:  # make sure to not override value set by user
@@ -310,24 +301,62 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
 
             self.configure(**{key: value})
 
-            if base.gui_controller.do_bug_fixes:
-                # make sure to also update the widget if a component has been updated
-                if "_" in key and self._comp_update_func is not None:
-                    self._comp_update_func(**{key: value})
+            # make sure to also update the widget if a component has been updated
+            self._update_parent(key, value)
 
         children = GuiUtil.get_gui_children(self)
         for child in children:  # propagate the theme to the children
             child.set_theme(theme, priority)
 
+    def _get_theme_options(self, theme: dict[str: Any]):
+        name = type(self).__name__
+        parent_class = type(self).__base__.__name__
+        gui_theme = {}
+
+        # start with general options, the specific theme for this element overrides values from the general theme
+        if "general" in theme:
+            gui_theme = theme["general"].copy()
+
+        # check if any options from superclass should be included
+        for key, value in theme.items():
+            if key.startswith("sub-") and key.endswith(parent_class):
+                gui_theme.update(value)
+                break
+
+        # add options set for this specific type of element
+        if name in theme:
+            gui_theme.update(theme[name])  # get theme for this gui-type
+
+        return gui_theme
+
     def __setitem__(self, key, value):
         super().__setitem__(key, value)
 
-        if base.gui_controller.do_bug_fixes:
-            # make sure to also update the widget if a component has been updated
-            if "_" in key and self._comp_update_func is not None:
-                self._comp_update_func(**{key: value})
+        # make sure to update element if a component has changed
+        self._update_parent(key, value)
 
         self._kw[key] = value  # keep track of the options set directly by the user, used for themability
+
+    def _update_parent(self, key, value):
+        if not base.gui_controller.do_bug_fixes:
+            return
+
+        # This is just a way to skip the update
+        if hasattr(self, "_update_comp"):
+            del self._update_comp
+            return
+
+        # make sure to update the widget if a component has been updated
+        if "_" in key and self._comp_update_func is not None:
+            self._comp_update_func(**{key: value})
+
+        # if self is a component: update the parent widget
+        parent = GuiUtil.get_parent(self)
+        parent = GuiUtil.get_gui(parent)
+        if parent is not None:
+            for comp in parent.components():
+                if self is parent.component(comp):
+                    parent._comp_update_func(**{key: value})
 
     def clear_theme(self):
         """Remove the theming options from this element and its children."""
