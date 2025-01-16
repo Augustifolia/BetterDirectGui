@@ -199,3 +199,12 @@ Just like `set_theme` this will propagate down the scene-graph.
 # Requirements:
 
 * Panda3d
+
+# Building distributable with BetterDirectGui
+
+To be able to use the default themes from `GuiTools.Themes.py`, you have to include the necessary assets. 
+To do this, add 
+```
+'package_data_dirs': {"BetterDirectGui": [('BetterDirectGui/assets/*', 'BetterDirectGui/assets', {})]}
+``` 
+to your `setup.py` file.

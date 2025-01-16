@@ -1,6 +1,18 @@
 """Tools to work with themes."""
 from copy import deepcopy
 from typing import Any
+from panda3d.core import Filename
+import os
+import sys
+
+# some useful directories for assets
+root = Filename.fromOsSpecific(os.path.dirname(os.path.dirname(__file__)))
+if getattr(sys, "frozen", False):
+    root = "BetterDirectGui"
+
+assets = f"{root}/assets"
+dark = f"{assets}/dark"
+light = f"{assets}/light"
 
 
 def merge(theme1: dict[str: dict[str: Any]] = None, theme2: dict[str: dict[str: Any]] = None) -> dict[str: dict[str: Any]]:

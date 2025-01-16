@@ -1,15 +1,8 @@
 """Module with some default themes to get more modern gui:s out of the box."""
 import direct.gui.DirectGuiGlobals as DGG
-from panda3d.core import Filename
-import os
 from BetterDirectGui.GuiTools import ThemeUtil
+from .ThemeUtil import root, light, dark, assets
 
-
-# some useful directories
-root = Filename.fromOsSpecific(os.path.dirname(os.path.dirname(__file__)))
-assets = Filename.fromOsSpecific(os.path.join(root, "assets"))
-dark = Filename.fromOsSpecific(os.path.join(assets, "dark"))
-light = Filename.fromOsSpecific(os.path.join(assets, "light"))
 
 __all__ = ["default_theme", "dark_theme"]
 
