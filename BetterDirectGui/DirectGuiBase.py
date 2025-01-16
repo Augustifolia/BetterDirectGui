@@ -575,8 +575,12 @@ class DirectGuiWidget(DirectGuiBase.DirectGuiWidget):
 
     def show_unclick(self):
         """Reset the scale changed in show_click."""
+        def reset_scale(scale):
+            if self.is_empty():  # Make sure self was not deleted
+                return
+            self.set_scale(scale)
         if hasattr(self, "_scale"):
-            self.do_method_later(0.1, self.set_scale, "unclick", [self._scale])
+            self.do_method_later(0.1, reset_scale, "unclick", [self._scale])
 
     def activate(self):
         """Do the stuff that need to happen for element to be selected properly.

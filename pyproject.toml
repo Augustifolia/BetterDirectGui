@@ -1,0 +1,34 @@
+[project]
+name = "BetterDirectGui"
+description = "An extended version of DirectGui for use in panda3d"
+
+version = "0.2"
+requires-python = ">= 3.9"
+
+authors = [{name = "Augustifolia"}]
+readme = "README.md"
+keywords = ["panda3d", "gamedev"]
+
+license = {text = "BSD-2-Clause"}
+
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Programming Language :: Python :: 3",
+]
+
+dependencies = [
+    "panda3d >= 1.10"
+]
+
+[project.optional-dependencies]
+optional = ["DirectGuiExtension @ git+ssh://git@github.com/Augustifolia/DirectGuiExtension@master"]
+
+[project.urls]
+source = "https://github.com/Augustifolia/BetterDirectGui"
+
+[build-system]
+requires = ["setuptools >= 61.0", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages]
+find = {namespaces = false}
